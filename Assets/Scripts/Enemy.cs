@@ -42,7 +42,39 @@ public abstract class Enemy : MonoBehaviour {
 
   void OnTriggerEnter(Collider other) {
     if (other.gameObject.tag == "explosion") {
-      Debug.Log("TODO handle this");
+	
+			//Tells current Enemy Element
+	  Debug.Log(element);
+			
+			//Should add 2x Damage for Weaknesses
+	  switch(other.gameObject.GetComponent<Explosion>().ExploElem){
+	    case(Element.water):     //If Water projectile
+		  if(Reference.elements[element].weakness.Contains(Element.water))
+		    Debug.Log("This Enemy is weak to Water");
+		  return;
+	    case(Element.fire):      //If Fire projectile
+		  if(Reference.elements[element].weakness.Contains(Element.fire))
+		    Debug.Log("This Enemy is weak to Fire");
+		  return;	    
+		case(Element.wood):      //If Wood projectile
+		  if(Reference.elements[element].weakness.Contains(Element.wood))
+		    Debug.Log("This Enemy is weak to Wood");
+		  return;	    
+		case(Element.earth):     //If Earth projectile
+		  if(Reference.elements[element].weakness.Contains(Element.earth))
+		    Debug.Log("This Enemy is weak to Earth");
+		  return;
+		case(Element.metal):     //If Metal projectile
+		  if(Reference.elements[element].weakness.Contains(Element.metal))
+		    Debug.Log("This Enemy is weak to Metal");
+		  return;
+		case(Element.holy):     //If Holy projectile
+		  if(Reference.elements[element].weakness.Contains(Element.holy))
+		    Debug.Log("This Enemy is weak to Holy");
+		  return;
+	  }
+			
+			//Otherwise... 
     }
   }
 

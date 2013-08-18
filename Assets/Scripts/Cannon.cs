@@ -28,7 +28,7 @@ public class Cannon : MonoBehaviour {
   }
 
   public void Fire(Vector3 aim) {
-    proj.Spawn(Element.fire, new Vector3(aim.x, aim.y, 0), this);
+    proj.Spawn(Element.earth, new Vector3(aim.x, aim.y, 0), this);
   }
 
   public Explosion getExplosion() {
