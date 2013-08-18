@@ -82,10 +82,10 @@ public class EnemyManager : MonoBehaviour {
   private void SpawnEnemies() {
     Enemy e;
     //generate enemy
-    if (rng.NextDouble() > 0.5f)
+//    if (rng.NextDouble() > 0.5f)
       e = popBasicEnemy();
-    else
-      e = popTestEnemy();
+ //   else
+ //     e = popTestEnemy();
 
     //generate behavior
     Element elem;
