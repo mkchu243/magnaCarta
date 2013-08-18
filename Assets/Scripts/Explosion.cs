@@ -4,7 +4,7 @@ using System.Collections;
 public class Explosion : MonoBehaviour {
   private Timer lifeTimer;
   private Element element;
-
+	
   void Awake() {
     transform.Rotate(new Vector3(90, 0, 0));
     lifeTimer = gameObject.AddComponent<Timer>();
@@ -21,10 +21,18 @@ public class Explosion : MonoBehaviour {
     }
 	}
 
-  public void Spawn(Element e, Vector3 pos) {
+  public void Spawn(Element e, Vector3 pos) {	
     gameObject.SetActive(true);
     transform.position = pos;
     lifeTimer.Restart(Projectile.projData[e].explosionDuration);
     gameObject.transform.localScale = new Vector3(Projectile.projData[e].explosionRadius, 0.25f, Projectile.projData[e].explosionRadius);
+	
+	element = e;     //sets private element var	
   }
+		
+  public Element ExploElem{
+	get{return element;}
+  set{ /*shouldn't be able to change*/}
+  }
+	
 }
