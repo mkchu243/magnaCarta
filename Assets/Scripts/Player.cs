@@ -56,4 +56,5 @@ public class Player : MonoBehaviour {
   public float Life {
     get { return life; }
   }
+	
 }
