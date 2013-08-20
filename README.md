@@ -15,6 +15,8 @@ git merge master<br>
 <resolve conflict><br>
 run and make sure the game still works<br>
 git commit<br>
+<br>
+do a pull request via github <br>
 
 ##useful commands<br>
 cd path [change directory]<br>
