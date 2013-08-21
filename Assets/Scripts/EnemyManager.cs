@@ -53,7 +53,7 @@ public class EnemyManager : MonoBehaviour {
     switch (GameManager.state){
       case GameManager.GameState.running:
         //spawn new enemies
-        if (spawnTimer.time <= 0){
+        if (spawnTimer.TheTime <= 0){
           SpawnEnemies();
           spawnTimer.Restart(spawnTime);
         }

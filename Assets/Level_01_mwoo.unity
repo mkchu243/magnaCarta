@@ -452,6 +452,14 @@ Prefab:
       propertyPath: m_LocalRotation.w
       value: .707106829
       objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: fafefd571fc9c4747b2e8a9aa20833bc, type: 2}
+      propertyPath: cannonMat
+      value: 
+      objectReference: {fileID: 2100000, guid: 8e1f3ddc7a22b7845ab9bad4dcbcfa89, type: 2}
+    - target: {fileID: 11400000, guid: fafefd571fc9c4747b2e8a9aa20833bc, type: 2}
+      propertyPath: rotSpeed
+      value: 95
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: fafefd571fc9c4747b2e8a9aa20833bc, type: 2}
   m_RootGameObject: {fileID: 2002049391}
@@ -540,5 +548,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c60b6375261662b42a9f978763958166, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rotSpeed: 95
   projectilePrefab: {fileID: 11400000, guid: 6a91fbdfb6729f54385dad018182f212, type: 2}
   explosionPrefab: {fileID: 11400000, guid: ab8a3ec6014275d43b3811ca7e7f5958, type: 2}
+  cannonMat: {fileID: 2100000, guid: 8e1f3ddc7a22b7845ab9bad4dcbcfa89, type: 2}
