@@ -5,8 +5,10 @@ public class Cannon : MonoBehaviour {
   // Variables for rotating
   private const float zeroRotation = 90;  // the offset for where the cannon is along the x-axis
   private const float tolerance = 1.5f;     // the angle tolerance of the cannon
+  private const float fullCircle = 360f;  // A full circle
   private Vector3 pivotPoint; // the point where the cannon pivots around
   private float finalAngle;   // the end angle the cannon should be at
+  private float angleDiff;
   private float rotSpeed = 95f;      // the rotation speed of the cannon
   private int rotDirection;   // the direction to rotate in.  1 = clockwise, -1 = counter-clockwise
 
@@ -29,7 +31,6 @@ public class Cannon : MonoBehaviour {
   // Materials
   public static System.Random rng;
   private Material cannonMat;
-  public GameObject cannonSphere;
 
   void Awake () {
     inactiveProj = new Stack<Projectile>();
@@ -41,9 +42,6 @@ public class Cannon : MonoBehaviour {
 	  pivotPoint = new Vector3(transform.position.x - transform.localScale.y, transform.position.y, transform.position.z);
     coolTimer = gameObject.AddComponent<Timer>();
 
-    cannonSphere.gameObject.SetActive(true);
-    // cannonSphere = (GameObject)( Instantiate(cannonSphere, pivotPoint, Quaternion.identity) );
-
     rng = new System.Random();
     cannonMat = Resources.Load("Materials/cannonMat") as Material;
   }
@@ -54,19 +52,26 @@ public class Cannon : MonoBehaviour {
 
   // Update is called once per frame
   void Update () {
-    cannonEnd = CannonEnd;
+    if( GameManager.state == GameManager.GameState.running ) {
+      cannonEnd = CannonEnd;
 
-    // Tests if the cannon is in the right rotation position and changes if not
-    if(Mathf.Abs(finalAngle - transform.eulerAngles.z) < tolerance) {
-      if(fireReady && coolTimer.TheTime <= 0) {  // If player chose to fire, will shoot
-        finalAngle = transform.eulerAngles.z;
-        Shoot(target, elem);
+      // Tests if the cannon is in the right rotation position and changes if not
+      if(Mathf.Abs(finalAngle - transform.eulerAngles.z) < tolerance) {
+        if(fireReady && coolTimer.TheTime <= 0) {  // If player chose to fire, will shoot
+          finalAngle = transform.eulerAngles.z;
+          Shoot(target, elem);
+        }
       }
-    }
-    else {
-      transform.RotateAround(pivotPoint, Vector3.forward, rotDirection * rotSpeed * Time.deltaTime);
+      else {
+        transform.RotateAround(pivotPoint, Vector3.forward, rotDirection * rotSpeed * Time.deltaTime);
+        if( angleAdjust(Mathf.Abs(finalAngle - transform.eulerAngles.z)) > angleDiff ) {
+          rotDirection *= -1;
+        }
+      }
+      angleDiff = angleAdjust(Mathf.Abs(finalAngle - transform.eulerAngles.z)); // used to make sure the cannon is rotating in the correct direction
     }
   }
+
 
   public void Restart(){
     fireReady = false;
@@ -95,9 +100,16 @@ public class Cannon : MonoBehaviour {
       }
     }
 
+    // Reset mats
+    transform.renderer.material = cannonMat;
+    foreach ( Transform child in transform ) {
+      child.renderer.material = cannonMat;
+    }
+    // Reset angles
     transform.RotateAround( pivotPoint, Vector3.forward, zeroRotation - transform.eulerAngles.z );
     finalAngle = zeroRotation;  // set so the cannon doesn't rotate in the beginning
   }
+
 
   /**
    * Called from Player to fire a projectile.  First must rotate the cannon, then shoot.
@@ -134,6 +146,7 @@ public class Cannon : MonoBehaviour {
     }
   }
   
+
   /**
    * Will actually launch the projectile.
    *
@@ -171,6 +184,7 @@ public class Cannon : MonoBehaviour {
     coolTimer.Restart(maxCool);
   }
 
+
   public void CreateExplosion(Element elem, Vector3 pos) {
     Explosion ex;
     int key = 0;
@@ -195,16 +209,20 @@ public class Cannon : MonoBehaviour {
     ex.Spawn(elem, pos, this, key);
   }
 
+
+  // Pushes Projectiles onto the stack
   public void Reload(Projectile proj) {
     inactiveProj.Push(proj);
     activeProj.Remove(proj.Key);
   }
 
+  // Pushes Explosions onto the stack
   public void Reload(Explosion ex) {
     inactiveExplosion.Push(ex);
     activeExplosion.Remove(ex.Key);
   }
 	
+
   /**
    * Rotates the cannon.  Intended to be used for firing projectiles in a different direction.
    * 
@@ -234,8 +252,20 @@ public class Cannon : MonoBehaviour {
       else
         rotDirection = -1;
     }
+    angleDiff = angleAdjust(Mathf.Abs( angle - transform.eulerAngles.z ));
 
     finalAngle = angle;
+  }
+
+
+  /*
+   * If the Angle is greater than half a circle, adjusts around 360 so angleDiff can
+   * correctly calculate the angle difference between current and finalAngle
+   */
+  private float angleAdjust(float num) {
+    if( num > fullCircle / 2)
+      num = Mathf.Abs( num - 360 );
+    return num;
   }
 
   //////////////////////////  Properties  ////////////////////////////////
