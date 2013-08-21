@@ -1,5 +1,22 @@
 <h1>magnaCarta</h1>
 http://grapefruitgames.com/2013/05/05/unitygitpt3/<br>
+ALWAYS MERGE MASTER INTO YOUR BRANCH FIRST<br>
+//commit your new feature (on your branch)<br>
+git commit -m "my newest feature<br>
+git push<br>
+<br>
+//get latest version of master<br>
+git checkout master<br>
+git pull<br>
+<br>
+//merge master into my branch<br>
+git checkout myname_dev<br>
+git merge master<br>
+<resolve conflict><br>
+run and make sure the game still works<br>
+git commit<br>
+<br>
+do a pull request via github <br>
 
 ##useful commands<br>
 cd path [change directory]<br>
