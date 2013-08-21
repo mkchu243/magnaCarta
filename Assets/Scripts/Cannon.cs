@@ -29,6 +29,7 @@ public class Cannon : MonoBehaviour {
   // Materials
   public static System.Random rng;
   private Material cannonMat;
+  public GameObject cannonSphere;
 
   void Awake () {
     inactiveProj = new Stack<Projectile>();
@@ -37,8 +38,11 @@ public class Cannon : MonoBehaviour {
     activeExplosion = new Dictionary<int, Explosion>();
 
     // calculates the pivot point equal to 1/4 the way down the cannon
-	  pivotPoint = new Vector3(transform.position.x - (transform.localScale.x / 4f), transform.position.y, transform.position.z);
+	  pivotPoint = new Vector3(transform.position.x - transform.localScale.y, transform.position.y, transform.position.z);
     coolTimer = gameObject.AddComponent<Timer>();
+
+    cannonSphere.gameObject.SetActive(true);
+    // cannonSphere = (GameObject)( Instantiate(cannonSphere, pivotPoint, Quaternion.identity) );
 
     rng = new System.Random();
     cannonMat = Resources.Load("Materials/cannonMat") as Material;
@@ -107,27 +111,26 @@ public class Cannon : MonoBehaviour {
     float rand = (float)(6 * rng.NextDouble());
     if( rand < 1 ) {
       elem = Element.water;
-      transform.renderer.material = Reference.elements[elem].mat;
     }
     else if( rand < 2 ) {
       elem = Element.fire;
-      transform.renderer.material = Reference.elements[elem].mat;
     }
     else if( rand < 3 ) {
       elem = Element.wood;
-      transform.renderer.material = Reference.elements[elem].mat;
     }
     else if( rand < 4 ) {
       elem = Element.earth;
-      transform.renderer.material = Reference.elements[elem].mat;
     }
     else if( rand < 5 ) {
       elem = Element.metal;
-      transform.renderer.material = Reference.elements[elem].mat;
     }
     else {
       elem = Element.holy;
-      transform.renderer.material = Reference.elements[elem].mat;
+    }
+    transform.renderer.material = Reference.elements[elem].mat;
+
+    foreach ( Transform child in transform ) {
+      child.renderer.material = Reference.elements[elem].mat;
     }
   }
   
@@ -140,6 +143,7 @@ public class Cannon : MonoBehaviour {
     Projectile proj;
     int key = 0;
 
+    // Obtains an available Projectile
     if( inactiveProj.Count > 0 ) {
       proj = inactiveProj.Pop();
     }
@@ -147,6 +151,7 @@ public class Cannon : MonoBehaviour {
       proj = (Projectile)( Instantiate(projectilePrefab, new Vector3(0f, 0f, -100f), Quaternion.identity) );
     }
 
+    // finds an available key
     for(int i = 0; i < activeProj.Count + 1; i++) {
       if(!activeProj.ContainsKey(i)) {
         key = i;
@@ -157,6 +162,10 @@ public class Cannon : MonoBehaviour {
     activeProj.Add(key, proj);
 
     transform.renderer.material = cannonMat;
+    foreach ( Transform child in transform ) {
+      child.renderer.material = cannonMat;
+    }
+
     proj.Spawn(element, cannonEnd, Trajectory, this, key);
     fireReady = false;
     coolTimer.Restart(maxCool);
@@ -165,6 +174,8 @@ public class Cannon : MonoBehaviour {
   public void CreateExplosion(Element elem, Vector3 pos) {
     Explosion ex;
     int key = 0;
+
+    // Obtains an available Explosion
     if( inactiveExplosion.Count > 0 ) {
       ex = inactiveExplosion.Pop();
     }
@@ -172,6 +183,7 @@ public class Cannon : MonoBehaviour {
       ex = (Explosion)( Instantiate(explosionPrefab, new Vector3(0f, 0f, -100f), Quaternion.identity) );
     }
     
+    // finds an available key
     for( int i = 0; i < activeExplosion.Count + 1; i++ ) {
       if(!activeExplosion.ContainsKey(i)) {
         key = i;
@@ -180,7 +192,6 @@ public class Cannon : MonoBehaviour {
     }
 
     activeExplosion.Add(key, ex);  // Key needed to keep track of active explosions
-    ex.transform.renderer.material = Reference.elements[elem].mat;
     ex.Spawn(elem, pos, this, key);
   }
 
