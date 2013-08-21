@@ -4,11 +4,12 @@ using System.Collections;
 public class Explosion : MonoBehaviour {
   private Timer lifeTimer;
   private Element element;
-  private const float initRad = 1;
+  private float initRad = 1;
   private float maxRad;
   private float duration;
   private float speed;
-  private Projectile proj; // Needs to know so projectile can know when to reload
+  private Cannon cannon; // Needs to know so explosion can recycle
+  private int key;
 
   void Awake() {
     transform.Rotate(new Vector3(90, 0, 0));
@@ -23,7 +24,7 @@ public class Explosion : MonoBehaviour {
 	void Update () {
     if (lifeTimer.TheTime <= 0) {
       gameObject.SetActive(false);
-      proj.Reload();
+      cannon.Reload(this);
     }
     else if (transform.localScale.x < maxRad) {
       float rad = (1f - (lifeTimer.TheTime / speed) / duration) * (maxRad - initRad) + initRad;
@@ -31,15 +32,21 @@ public class Explosion : MonoBehaviour {
     }
 	}
 
-  public void Spawn(Element e, Vector3 pos, Projectile p) {
+  public void Spawn(Element e, Vector3 pos, Cannon c, int k) {
     gameObject.SetActive(true);
     transform.position = pos;
     duration = Projectile.projData[e].explosionDuration;
     lifeTimer.Restart(duration);
     maxRad = Projectile.projData[e].explosionRadius;
     gameObject.transform.localScale = new Vector3(initRad, 0.25f, initRad);
-    proj = p;
+    cannon = c;
+    key = k;
+    initRad = 1f;
 
     speed = 1f;  // TODO edit for element speed of growth
+  }
+
+  public int Key {
+    get { return key; }
   }
 }

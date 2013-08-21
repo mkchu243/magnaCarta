@@ -6,7 +6,6 @@ public class Projectile : MonoBehaviour {
   private Element element;
   private Vector3 traj;  // the trajectory of the projectile
   private Cannon cannon; //needs to know this so it can recycle projectile
-  private Explosion explosion;
   private int key;  // needs to know to remove from active dictionary
 
   public const float KillX = 30f;
@@ -32,16 +31,16 @@ public class Projectile : MonoBehaviour {
 
     /*  May not use explode timer
     if (explodeTimer.time <= 0) {
-      cannon.getExplosion().Spawn(element, transform.position);
+      cannon.CreateExplosion(element, transform.position);
       gameObject.SetActive(false);
     }
     */
 	}
 
   void OnTriggerEnter(Collider other) {
-    explosion.transform.renderer.material = Reference.elements[element].mat;
-    explosion.Spawn(element, transform.position, this);
+    cannon.CreateExplosion(element, transform.position);
     gameObject.SetActive(false);
+    Reload();
   }
 
   public void Spawn(Element e, Vector3 aim, Vector3 dir, Cannon c, int k) {
@@ -54,10 +53,6 @@ public class Projectile : MonoBehaviour {
     key = k;
     transform.renderer.material = Reference.elements[element].mat;
 
-    if(explosion == null) {
-      explosion = (Explosion)Instantiate(cannon.explosionPrefab, new Vector3(0f, 0f, -100f), Quaternion.identity);
-      explosion.gameObject.SetActive(false);
-    }
   }
 
   public void Reload() {
@@ -66,10 +61,6 @@ public class Projectile : MonoBehaviour {
 
   public int Key {
     get { return key; }
-  }
-
-  public Explosion Explosion {
-    get { return explosion; }
   }
 
   //Proj Info

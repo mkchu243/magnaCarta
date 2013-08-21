@@ -15,6 +15,8 @@ public class Cannon : MonoBehaviour {
   public Explosion explosionPrefab;   // the explosion prefab
   private Stack<Projectile> inactiveProj;
   private Dictionary<int, Projectile> activeProj;
+  private Stack<Explosion> inactiveExplosion;
+  private Dictionary<int, Explosion> activeExplosion;
 
   // Variables for firing
   private bool fireReady;             // Boolean to say if the cannon's ready to fire
@@ -31,6 +33,8 @@ public class Cannon : MonoBehaviour {
   void Awake () {
     inactiveProj = new Stack<Projectile>();
     activeProj = new Dictionary<int, Projectile>();
+    inactiveExplosion = new Stack<Explosion>();
+    activeExplosion = new Dictionary<int, Explosion>();
 
     // calculates the pivot point equal to 1/4 the way down the cannon
 	  pivotPoint = new Vector3(transform.position.x - (transform.localScale.x / 4f), transform.position.y, transform.position.z);
@@ -64,15 +68,25 @@ public class Cannon : MonoBehaviour {
     fireReady = false;
     coolTimer.Restart(0f);
 
-    // Removes any active projectiles or explosions
+    // Removes any active projectiles 
     int count = activeProj.Count;
     Projectile proj;
     for(int i = 0; count > 0; i++) {
       if( activeProj.ContainsKey(i) ) {
         proj = activeProj[i];
-        proj.Explosion.gameObject.SetActive(false);
         proj.gameObject.SetActive(false);
         activeProj.Remove(i);
+        count--;
+      }
+    }
+    // Remove active explosions
+    count = activeExplosion.Count;
+    Explosion ex;
+    for(int i = 0; count > 0; i++) {
+      if( activeExplosion.ContainsKey(i) ) {
+        ex = activeExplosion[i];
+        ex.gameObject.SetActive(false);
+        activeExplosion.Remove(i);
         count--;
       }
     }
@@ -130,7 +144,7 @@ public class Cannon : MonoBehaviour {
       proj = inactiveProj.Pop();
     }
     else {
-      proj = (Projectile)(Instantiate( projectilePrefab, new Vector3(0f, 0f, -100f), Quaternion.identity ));
+      proj = (Projectile)( Instantiate(projectilePrefab, new Vector3(0f, 0f, -100f), Quaternion.identity) );
     }
 
     for(int i = 0; i < activeProj.Count + 1; i++) {
@@ -148,9 +162,36 @@ public class Cannon : MonoBehaviour {
     coolTimer.Restart(maxCool);
   }
 
+  public void CreateExplosion(Element elem, Vector3 pos) {
+    Explosion ex;
+    int key = 0;
+    if( inactiveExplosion.Count > 0 ) {
+      ex = inactiveExplosion.Pop();
+    }
+    else {
+      ex = (Explosion)( Instantiate(explosionPrefab, new Vector3(0f, 0f, -100f), Quaternion.identity) );
+    }
+    
+    for( int i = 0; i < activeExplosion.Count + 1; i++ ) {
+      if(!activeExplosion.ContainsKey(i)) {
+        key = i;
+        break;
+      }
+    }
+
+    activeExplosion.Add(key, ex);  // Key needed to keep track of active explosions
+    ex.transform.renderer.material = Reference.elements[elem].mat;
+    ex.Spawn(elem, pos, this, key);
+  }
+
   public void Reload(Projectile proj) {
     inactiveProj.Push(proj);
     activeProj.Remove(proj.Key);
+  }
+
+  public void Reload(Explosion ex) {
+    inactiveExplosion.Push(ex);
+    activeExplosion.Remove(ex.Key);
   }
 	
   /**
