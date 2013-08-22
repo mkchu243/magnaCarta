@@ -20,13 +20,14 @@ public class Projectile : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-    if( GameManager.state == GameManager.GameState.running ){
-      transform.Translate( projData[element].speed * Time.deltaTime * traj, Space.World );
+    switch( GameManager.state ) {
+      case GameManager.GameState.running:
+        transform.Translate( projData[element].speed * Time.deltaTime * traj, Space.World );
 
-      if( transform.position.x > KillX ) {
-        gameObject.SetActive(false);
-        Reload();
-      }
+        if( transform.position.x > KillX ) {
+          gameObject.SetActive(false);
+          Reload();
+        }
     }
 
     /*  May not use explode timer

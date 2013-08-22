@@ -22,13 +22,17 @@ public class Explosion : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-    if (lifeTimer.TheTime <= 0) {
-      gameObject.SetActive(false);
-      cannon.Reload(this);
-    }
-    else if (transform.localScale.x < maxRad) {
-      float rad = (1f - (lifeTimer.TheTime / speed) / duration) * (maxRad - initRad) + initRad;
-      gameObject.transform.localScale = new Vector3( rad, 0.25f, rad);
+    switch( GameManager.state ) {
+      case GameManager.GameState.running:
+        if (lifeTimer.TheTime <= 0) {
+          gameObject.SetActive(false);
+          cannon.Reload(this);
+        }
+        else if (transform.localScale.x < maxRad) {
+          float rad = (1f - (lifeTimer.TheTime / speed) / duration) * (maxRad - initRad) + initRad;
+          gameObject.transform.localScale = new Vector3( rad, 0.25f, rad);
+        }
+        break;
     }
 	}
 

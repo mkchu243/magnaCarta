@@ -660,4 +660,3 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   projectilePrefab: {fileID: 11400000, guid: 6a91fbdfb6729f54385dad018182f212, type: 2}
   explosionPrefab: {fileID: 11400000, guid: ab8a3ec6014275d43b3811ca7e7f5958, type: 2}
-  cannonSphere: {fileID: 0}

@@ -2,14 +2,17 @@ using UnityEngine;
 using System.Collections.Generic;
 
 public class Cannon : MonoBehaviour {
-  // Variables for rotating
+  // Constants
   private const float zeroRotation = 90;  // the offset for where the cannon is along the x-axis
   private const float tolerance = 1.5f;     // the angle tolerance of the cannon
   private const float fullCircle = 360f;  // A full circle
+  private float rotSpeed = 95f;      // the rotation speed of the cannon
+  private const float maxCool = 1.2f;                // the max cooldown
+
+  // Variables for rotating
   private Vector3 pivotPoint; // the point where the cannon pivots around
   private float finalAngle;   // the end angle the cannon should be at
-  private float angleDiff;
-  private float rotSpeed = 95f;      // the rotation speed of the cannon
+  private float angleDiff;    // The angle difference between current angle and the final angle
   private int rotDirection;   // the direction to rotate in.  1 = clockwise, -1 = counter-clockwise
 
   // Variables for objects
@@ -25,7 +28,6 @@ public class Cannon : MonoBehaviour {
   private Vector3 cannonEnd;          // the shooting end of the cannon
   private Vector3 target;             // the target to shoot towards
   private Timer coolTimer;               // the cooldown timer for shooting
-  private const float maxCool = 1.2f;                // the max cooldown
   private Element elem;                  // the element to fire
 
   // Materials
@@ -52,23 +54,25 @@ public class Cannon : MonoBehaviour {
 
   // Update is called once per frame
   void Update () {
-    if( GameManager.state == GameManager.GameState.running ) {
-      cannonEnd = CannonEnd;
+    switch( GameManager.state ) {
+      case GameManager.GameState.running:
+        cannonEnd = CannonEnd;
 
-      // Tests if the cannon is in the right rotation position and changes if not
-      if(Mathf.Abs(finalAngle - transform.eulerAngles.z) < tolerance) {
-        if(fireReady && coolTimer.TheTime <= 0) {  // If player chose to fire, will shoot
-          finalAngle = transform.eulerAngles.z;
-          Shoot(target, elem);
+        // Tests if the cannon is in the right rotation position and changes if not
+        if(Mathf.Abs(finalAngle - transform.eulerAngles.z) < tolerance) {
+          if(fireReady && coolTimer.TheTime <= 0) {  // If player chose to fire, will shoot
+            finalAngle = transform.eulerAngles.z;
+            Shoot(target, elem);
+          }
         }
-      }
-      else {
-        transform.RotateAround(pivotPoint, Vector3.forward, rotDirection * rotSpeed * Time.deltaTime);
-        if( angleAdjust(Mathf.Abs(finalAngle - transform.eulerAngles.z)) > angleDiff ) {
-          rotDirection *= -1;
+        else {
+          transform.RotateAround(pivotPoint, Vector3.forward, rotDirection * rotSpeed * Time.deltaTime);
+          if( angleAdjust(Mathf.Abs(finalAngle - transform.eulerAngles.z)) > angleDiff ) {
+            rotDirection *= -1;
+          }
         }
-      }
-      angleDiff = angleAdjust(Mathf.Abs(finalAngle - transform.eulerAngles.z)); // used to make sure the cannon is rotating in the correct direction
+        angleDiff = angleAdjust(Mathf.Abs(finalAngle - transform.eulerAngles.z)); // used to make sure the cannon is rotating in the correct direction
+        break;
     }
   }
 
@@ -174,6 +178,7 @@ public class Cannon : MonoBehaviour {
 
     activeProj.Add(key, proj);
 
+    proj.transform.localScale = new Vector3(3, 3, 3);
     transform.renderer.material = cannonMat;
     foreach ( Transform child in transform ) {
       child.renderer.material = cannonMat;
