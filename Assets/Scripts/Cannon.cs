@@ -29,6 +29,7 @@ public class Cannon : MonoBehaviour {
   private Vector3 target;             // the target to shoot towards
   private Timer coolTimer;               // the cooldown timer for shooting
   private Element elem;                  // the element to fire
+  private float projInitRad;
 
   // Materials
   public static System.Random rng;
@@ -112,6 +113,7 @@ public class Cannon : MonoBehaviour {
     // Reset angles
     transform.RotateAround( pivotPoint, Vector3.forward, zeroRotation - transform.eulerAngles.z );
     finalAngle = zeroRotation;  // set so the cannon doesn't rotate in the beginning
+    projInitRad = 1f;
   }
 
 
@@ -178,7 +180,7 @@ public class Cannon : MonoBehaviour {
 
     activeProj.Add(key, proj);
 
-    proj.transform.localScale = new Vector3(3, 3, 3);
+    proj.transform.localScale = new Vector3(projInitRad, projInitRad, projInitRad);
     transform.renderer.material = cannonMat;
     foreach ( Transform child in transform ) {
       child.renderer.material = cannonMat;
