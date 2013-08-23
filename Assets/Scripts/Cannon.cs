@@ -19,9 +19,9 @@ public class Cannon : MonoBehaviour {
   public Projectile projectilePrefab; // The projectile prefab
   public Explosion explosionPrefab;   // the explosion prefab
   private Stack<Projectile> inactiveProj;
-  private Dictionary<int, Projectile> activeProj;
+  private HashSet<Projectile> activeProj;
   private Stack<Explosion> inactiveExplosion;
-  private Dictionary<int, Explosion> activeExplosion;
+  private HashSet<Explosion> activeExplosion;
 
   // Variables for firing
   private bool fireReady;             // Boolean to say if the cannon's ready to fire
@@ -37,9 +37,9 @@ public class Cannon : MonoBehaviour {
 
   void Awake () {
     inactiveProj = new Stack<Projectile>();
-    activeProj = new Dictionary<int, Projectile>();
+    activeProj = new HashSet<Projectile>();
     inactiveExplosion = new Stack<Explosion>();
-    activeExplosion = new Dictionary<int, Explosion>();
+    activeExplosion = new HashSet<Explosion>();
 
     // calculates the pivot point equal to 1/4 the way down the cannon
 	  pivotPoint = new Vector3(transform.position.x - transform.localScale.y, transform.position.y, transform.position.z);
@@ -68,11 +68,11 @@ public class Cannon : MonoBehaviour {
         }
         else {
           transform.RotateAround(pivotPoint, Vector3.forward, rotDirection * rotSpeed * Time.deltaTime);
-          if( angleAdjust(Mathf.Abs(finalAngle - transform.eulerAngles.z)) > angleDiff ) {
+          if( AngleAdjust(Mathf.Abs(finalAngle - transform.eulerAngles.z)) > angleDiff ) {
             rotDirection *= -1;
           }
         }
-        angleDiff = angleAdjust(Mathf.Abs(finalAngle - transform.eulerAngles.z)); // used to make sure the cannon is rotating in the correct direction
+        angleDiff = AngleAdjust(Mathf.Abs(finalAngle - transform.eulerAngles.z)); // used to make sure the cannon is rotating in the correct direction
         break;
     }
   }
@@ -82,34 +82,19 @@ public class Cannon : MonoBehaviour {
     fireReady = false;
     coolTimer.Restart(0f);
 
-    // Removes any active projectiles 
-    int count = activeProj.Count;
-    Projectile proj;
-    for(int i = 0; count > 0; i++) {
-      if( activeProj.ContainsKey(i) ) {
-        proj = activeProj[i];
-        proj.gameObject.SetActive(false);
-        activeProj.Remove(i);
-        count--;
-      }
+    // Removes any active projectiles
+    foreach( Projectile proj in activeProj ) {
+      Reload(proj);
     }
-    // Remove active explosions
-    count = activeExplosion.Count;
-    Explosion ex;
-    for(int i = 0; count > 0; i++) {
-      if( activeExplosion.ContainsKey(i) ) {
-        ex = activeExplosion[i];
-        ex.gameObject.SetActive(false);
-        activeExplosion.Remove(i);
-        count--;
-      }
+    activeProj.Clear();
+    // Removes any active explosions
+    foreach( Explosion ex in activeExplosion ) {
+      Reload(ex);
     }
+    activeExplosion.Clear();
 
     // Reset mats
-    transform.renderer.material = cannonMat;
-    foreach ( Transform child in transform ) {
-      child.renderer.material = cannonMat;
-    }
+    ResetMat();
     // Reset angles
     transform.RotateAround( pivotPoint, Vector3.forward, zeroRotation - transform.eulerAngles.z );
     finalAngle = zeroRotation;  // set so the cannon doesn't rotate in the beginning
@@ -145,11 +130,8 @@ public class Cannon : MonoBehaviour {
     else {
       elem = Element.holy;
     }
-    transform.renderer.material = Reference.elements[elem].mat;
 
-    foreach ( Transform child in transform ) {
-      child.renderer.material = Reference.elements[elem].mat;
-    }
+    ResetMat();
   }
   
 
@@ -160,7 +142,6 @@ public class Cannon : MonoBehaviour {
    */
   private void Shoot(Vector3 aim, Element element){
     Projectile proj;
-    int key = 0;
 
     // Obtains an available Projectile
     if( inactiveProj.Count > 0 ) {
@@ -170,15 +151,7 @@ public class Cannon : MonoBehaviour {
       proj = (Projectile)( Instantiate(projectilePrefab, new Vector3(0f, 0f, -100f), Quaternion.identity) );
     }
 
-    // finds an available key
-    for(int i = 0; i < activeProj.Count + 1; i++) {
-      if(!activeProj.ContainsKey(i)) {
-        key = i;
-        break;
-      }
-    }
-
-    activeProj.Add(key, proj);
+    activeProj.Add(proj);
 
     proj.transform.localScale = new Vector3(projInitRad, projInitRad, projInitRad);
     transform.renderer.material = cannonMat;
@@ -186,7 +159,7 @@ public class Cannon : MonoBehaviour {
       child.renderer.material = cannonMat;
     }
 
-    proj.Spawn(element, cannonEnd, Trajectory, this, key);
+    proj.Spawn(element, cannonEnd, Trajectory, this);
     fireReady = false;
     coolTimer.Restart(maxCool);
   }
@@ -194,7 +167,6 @@ public class Cannon : MonoBehaviour {
 
   public void CreateExplosion(Element elem, Vector3 pos) {
     Explosion ex;
-    int key = 0;
 
     // Obtains an available Explosion
     if( inactiveExplosion.Count > 0 ) {
@@ -204,29 +176,27 @@ public class Cannon : MonoBehaviour {
       ex = (Explosion)( Instantiate(explosionPrefab, new Vector3(0f, 0f, -100f), Quaternion.identity) );
     }
     
-    // finds an available key
-    for( int i = 0; i < activeExplosion.Count + 1; i++ ) {
-      if(!activeExplosion.ContainsKey(i)) {
-        key = i;
-        break;
-      }
-    }
-
-    activeExplosion.Add(key, ex);  // Key needed to keep track of active explosions
-    ex.Spawn(elem, pos, this, key);
+    activeExplosion.Add(ex);  // Key needed to keep track of active explosions
+    ex.Spawn(elem, pos, this);
   }
 
 
   // Pushes Projectiles onto the stack
   public void Reload(Projectile proj) {
+    proj.Die();
     inactiveProj.Push(proj);
-    activeProj.Remove(proj.Key);
+    if( !(GameManager.state == GameManager.GameState.restart) ) {
+      activeProj.Remove(proj);
+    }
   }
 
   // Pushes Explosions onto the stack
   public void Reload(Explosion ex) {
+    ex.Die();
     inactiveExplosion.Push(ex);
-    activeExplosion.Remove(ex.Key);
+    if( !(GameManager.state == GameManager.GameState.restart) ) {
+      activeExplosion.Remove(ex);
+    }
   }
 	
 
@@ -259,17 +229,23 @@ public class Cannon : MonoBehaviour {
       else
         rotDirection = -1;
     }
-    angleDiff = angleAdjust(Mathf.Abs( angle - transform.eulerAngles.z ));
+    angleDiff = AngleAdjust(Mathf.Abs( angle - transform.eulerAngles.z ));
 
     finalAngle = angle;
   }
 
+  private void ResetMat() {
+    transform.renderer.material = cannonMat;
+    foreach(Transform child in transform) {
+      child.transform.renderer.material = cannonMat;
+    }
+  }
 
   /*
    * If the Angle is greater than half a circle, adjusts around 360 so angleDiff can
    * correctly calculate the angle difference between current and finalAngle
    */
-  private float angleAdjust(float num) {
+  private float AngleAdjust(float num) {
     if( num > fullCircle / 2)
       num = Mathf.Abs( num - 360 );
     return num;

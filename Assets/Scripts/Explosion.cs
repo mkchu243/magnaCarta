@@ -9,7 +9,6 @@ public class Explosion : MonoBehaviour {
   private float duration;
   private float speed;
   private Cannon cannon; // Needs to know so explosion can recycle
-  private int key;
 
   void Awake() {
     transform.Rotate(new Vector3(90, 0, 0));
@@ -25,8 +24,7 @@ public class Explosion : MonoBehaviour {
     switch( GameManager.state ) {
       case GameManager.GameState.running:
         if (lifeTimer.TheTime <= 0) {
-          gameObject.SetActive(false);
-          cannon.Reload(this);
+          Reload();
         }
         else if (transform.localScale.x < maxRad) {
           float rad = (1f - (lifeTimer.TheTime / speed) / duration) * (maxRad - initRad) + initRad;
@@ -36,7 +34,7 @@ public class Explosion : MonoBehaviour {
     }
 	}
 
-  public void Spawn(Element e, Vector3 pos, Cannon c, int k) {
+  public void Spawn(Element e, Vector3 pos, Cannon c) {
     gameObject.SetActive(true);
     transform.position = pos;
 
@@ -48,12 +46,17 @@ public class Explosion : MonoBehaviour {
     gameObject.transform.localScale = new Vector3(initRad, 0.25f, initRad);
     transform.renderer.material = Reference.elements[e].mat;
     cannon = c;
-    key = k;
 
     speed = 1f;  // TODO edit for element speed of growth
   }
 
-  public int Key {
-    get { return key; }
+  public void Reload() {
+    cannon.Reload(this);
   }
+
+  public void Die() {
+    gameObject.SetActive(false);
+  }
+
+
 }
