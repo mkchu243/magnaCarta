@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour {
     case GameState.restart:
       EnemyManager.Instance.Restart();
       Player.Instance.Restart();
+	  PowerUpManager.Instance.Restart();
       state = GameState.running;
       break;
     //case GameState.running:

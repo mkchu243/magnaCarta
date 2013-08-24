@@ -84,17 +84,17 @@ public class Cannon : MonoBehaviour {
 
     // Removes any active projectiles
     foreach( Projectile proj in activeProj ) {
-      Reload(proj);
+      proj.Reload();
     }
     activeProj.Clear();
     // Removes any active explosions
     foreach( Explosion ex in activeExplosion ) {
-      Reload(ex);
+      ex.Reload();
     }
     activeExplosion.Clear();
 
     // Reset mats
-    ResetMat();
+    ChangeMat(cannonMat);
     // Reset angles
     transform.RotateAround( pivotPoint, Vector3.forward, zeroRotation - transform.eulerAngles.z );
     finalAngle = zeroRotation;  // set so the cannon doesn't rotate in the beginning
@@ -131,7 +131,7 @@ public class Cannon : MonoBehaviour {
       elem = Element.holy;
     }
 
-    ResetMat();
+    ChangeMat(Reference.elements[elem].mat);
   }
   
 
@@ -154,10 +154,7 @@ public class Cannon : MonoBehaviour {
     activeProj.Add(proj);
 
     proj.transform.localScale = new Vector3(projInitRad, projInitRad, projInitRad);
-    transform.renderer.material = cannonMat;
-    foreach ( Transform child in transform ) {
-      child.renderer.material = cannonMat;
-    }
+    ChangeMat(cannonMat);
 
     proj.Spawn(element, cannonEnd, Trajectory, this);
     fireReady = false;
@@ -183,7 +180,6 @@ public class Cannon : MonoBehaviour {
 
   // Pushes Projectiles onto the stack
   public void Reload(Projectile proj) {
-    proj.Die();
     inactiveProj.Push(proj);
     if( !(GameManager.state == GameManager.GameState.restart) ) {
       activeProj.Remove(proj);
@@ -192,7 +188,6 @@ public class Cannon : MonoBehaviour {
 
   // Pushes Explosions onto the stack
   public void Reload(Explosion ex) {
-    ex.Die();
     inactiveExplosion.Push(ex);
     if( !(GameManager.state == GameManager.GameState.restart) ) {
       activeExplosion.Remove(ex);
@@ -234,10 +229,10 @@ public class Cannon : MonoBehaviour {
     finalAngle = angle;
   }
 
-  private void ResetMat() {
-    transform.renderer.material = cannonMat;
+  private void ChangeMat(Material mat) {
+    transform.renderer.material = mat;
     foreach(Transform child in transform) {
-      child.transform.renderer.material = cannonMat;
+      child.transform.renderer.material = mat;
     }
   }
 

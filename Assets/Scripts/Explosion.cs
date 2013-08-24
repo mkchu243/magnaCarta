@@ -51,12 +51,7 @@ public class Explosion : MonoBehaviour {
   }
 
   public void Reload() {
+    gameObject.SetActive(false);
     cannon.Reload(this);
   }
-
-  public void Die() {
-    gameObject.SetActive(false);
-  }
-
-
 }

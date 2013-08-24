@@ -1,3 +1,5 @@
+// The old power-up script
+
 using UnityEngine;
 using System.Collections.Generic;
 

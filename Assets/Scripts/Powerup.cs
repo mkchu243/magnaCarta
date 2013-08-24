@@ -5,8 +5,9 @@ public class PowerUp : MonoBehaviour {
   // Constants
   private const float baseSpeed = -5.0f;
   private const float KillX = -27f;
+  private const float rotSpeed = 150f;
 
-  private PowerUpManager powManager = PowerUpManager.Instance;
+  private PowerUpManager powManager;
 
   // PowerUp information
   private float duration;
@@ -16,7 +17,11 @@ public class PowerUp : MonoBehaviour {
   private Element element;
   
   private float speed;
-  private int key;
+  private bool isMoving;
+
+  void Awake() {
+    powManager = PowerUpManager.Instance;
+  }
 
 	// Use this for initialization
 	void Start () {
@@ -26,23 +31,42 @@ public class PowerUp : MonoBehaviour {
 	void Update () {
     switch( GameManager.state ) {
       case GameManager.GameState.running:
-        transform.Translate(new Vector3(baseSpeed * Time.deltaTime, 0, 0));
+        transform.Rotate(new Vector3( 0f, rotSpeed * Time.deltaTime, 0f ), Space.World );
 
-        if(transform.position.x <= KillX) {
-          Die();
+        if( isMoving ) {
+          transform.Translate(new Vector3(speed * Time.deltaTime, 0, 0), Space.World);
+
+          if(transform.position.x <= KillX) {
+            Reload();
+          }
         }
         break;
     }
 	}
 
 
-  public void Spawn(Element elem, float speedMult, Vector3 pos, int k) {
+  public void Spawn(PowerUpManager.powType type, int lev, Element elem, float speedMult, float dur, Vector3 pos, bool buff) {
+    powType = type;
+    level = lev;
     element = elem;
     speed = speedMult * baseSpeed;
+    duration = dur;
     transform.position = pos;
+    isBuff = buff;
     gameObject.SetActive(true);
+    isMoving = true;
     setModel();
-    key = k;
+
+    if( transform.eulerAngles.z == 0 ) {
+      transform.Rotate( new Vector3(0f, 0f, 30f), Space.World );
+    }
+  }
+
+  
+  private void Activate() {
+    powManager.NumInEffect++;
+    isMoving = false;
+    
   }
 
   private void setModel() {
@@ -58,12 +82,8 @@ public class PowerUp : MonoBehaviour {
     }
   }
 
-  public void Die() {
-    gameObject.SetActive(false);
-    Reload();
-  }
-
   private void Reload() {
+    gameObject.SetActive(false);
     powManager.Reload(this);
   }
 
@@ -87,9 +107,5 @@ public class PowerUp : MonoBehaviour {
   public float Speed {
     get { return Speed; }
     set { Speed = value; }
-  }
-
-  public int Key {
-    get { return key; }
   }
 }
