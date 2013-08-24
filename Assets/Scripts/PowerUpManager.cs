@@ -3,19 +3,22 @@ using System.Collections.Generic;
 
 public class PowerUpManager : MonoBehaviour {
   private static PowerUpManager instance;
+  // The PowerUp types
   public enum powType{ projRad, explosionRad, damage, cooldown, rotSpeed, projSpeed, waterChange, fireChange,
     woodChange, earthChange, metalChange, holyChange, slowEnemy };
 
-  public const float SpawnX = 30;
-  private float spawnChance = 0.5f;
-  private const float spawnInterval = 1;
+  public const float SpawnX = 30;  // What X Value to spawn at
+  private float spawnChance = 0.5f;  // The percentage chance to spawn, in decimal
+  private const float spawnInterval = 1; // The Timer interval when another PowerUp may spawn
 
+  // Object variables
   public PowerUp powPrefab;
   private Stack<PowerUp> inactivePow;
   private HashSet<PowerUp> activePow;
-  private int numInEffect;
-  private Vector3 powPosition;
   private Timer spawnTimer;
+
+  private int numInEffect;      // Number of powerups in play
+  private Vector3 powPosition;  // Probably be moved later, for holding powerups
 
   private System.Random rng;
 
@@ -67,15 +70,41 @@ public class PowerUpManager : MonoBehaviour {
     // TODO randomize these
     powType type = powType.projRad;
     int level = 2;
-    bool isBuff = true;
+    bool isBuff = true;   // It's a buff not a debuff
+    Element element = RandomElement();
 
     powUp.Spawn(type,
                 level,
-                Element.fire,
-                PowData[type][level].speedMult,
-                PowData[type][level].duration,
+                element,
+                PowData[type][level-1].speedMult,
+                PowData[type][level-1].duration,
                 new Vector3(SpawnX, (float)(39 * rng.NextDouble() - 18), 0f),
                 isBuff);
+  }
+
+  public Element RandomElement() {
+    float rand = (float)(6 * rng.NextDouble());
+    Element element;
+    if( rand < 1 ) {
+      element = Element.water;
+    }
+    else if( rand < 2 ) {
+      element = Element.fire;
+    }
+    else if( rand < 3 ) {
+      element = Element.wood;
+    }
+    else if( rand < 4 ) {
+      element = Element.earth;
+    }
+    else if( rand < 5 ) {
+      element = Element.metal;
+    }
+    else {
+      element = Element.holy;
+    }
+
+    return element;
   }
 
   public void Reload(PowerUp pow) {
@@ -100,9 +129,9 @@ public class PowerUpManager : MonoBehaviour {
 
   ///////////////////////////  Data  //////////////////////////////
   private struct PowAttributes{
-    public float speedMult;
-    public float duration;
-    public float effectMult;
+    public float speedMult;      // Multiplier for movement speed
+    public float duration;       // Duration of PowerUp effect
+    public float effectMult;     // How much the PowerUp effects its respective area
 
     public PowAttributes(float speedMult,
                    float duration,
@@ -114,86 +143,87 @@ public class PowerUpManager : MonoBehaviour {
   }
 
   // TODO customize numbers
-  private static Dictionary<int, PowAttributes> projRadLevels = new Dictionary<int, PowAttributes> {
-    { 1, new PowAttributes(1f, 30f, 1.5f) },
-    { 2, new PowAttributes(1.5f, 40f, 1.75f) },
-    { 3, new PowAttributes(1.75f, 50f, 2f) }
+
+  private static PowAttributes[] projRadLevels = {
+    new PowAttributes(1f, 30f, 1.5f),
+    new PowAttributes(1.5f, 40f, 1.75f),
+    new PowAttributes(1.75f, 50f, 2f)
   };
 
-  private static Dictionary<int, PowAttributes> explosionRadLevels = new Dictionary<int, PowAttributes> {
-    { 1, new PowAttributes(1f, 30f, 1.5f) },
-    { 2, new PowAttributes(1.5f, 40f, 1.75f) },
-    { 3, new PowAttributes(1.75f, 50f, 2f) }
+  private static PowAttributes[] explosionRadLevels = {
+    new PowAttributes(1f, 30f, 1.5f),
+    new PowAttributes(1.5f, 40f, 1.75f),
+    new PowAttributes(1.75f, 50f, 2f)
   };
 
-  private static Dictionary<int, PowAttributes> damageLevels = new Dictionary<int, PowAttributes> {
-    { 1, new PowAttributes(1f, 30f, 1.5f) },
-    { 2, new PowAttributes(1.5f, 40f, 1.75f) },
-    { 3, new PowAttributes(1.75f, 50f, 2f) }
+  private static PowAttributes[] damageLevels = {
+    new PowAttributes(1f, 30f, 1.5f),
+    new PowAttributes(1.5f, 40f, 1.75f),
+    new PowAttributes(1.75f, 50f, 2f)
   };
 
-  private static Dictionary<int, PowAttributes> cooldownLevels = new Dictionary<int, PowAttributes> {
-    { 1, new PowAttributes(1f, 30f, 1.5f) },
-    { 2, new PowAttributes(1.5f, 40f, 1.75f) },
-    { 3, new PowAttributes(1.75f, 50f, 2f) }
+  private static PowAttributes[] cooldownLevels = {
+    new PowAttributes(1f, 30f, 1.5f),
+    new PowAttributes(1.5f, 40f, 1.75f),
+    new PowAttributes(1.75f, 50f, 2f)
   };
 
-  private static Dictionary<int, PowAttributes> rotSpeedLevels = new Dictionary<int, PowAttributes> {
-    { 1, new PowAttributes(1f, 30f, 1.5f) },
-    { 2, new PowAttributes(1.5f, 40f, 1.75f) },
-    { 3, new PowAttributes(1.75f, 50f, 2f) }
+  private static PowAttributes[] rotSpeedLevels = {
+    new PowAttributes(1f, 30f, 1.5f),
+    new PowAttributes(1.5f, 40f, 1.75f),
+    new PowAttributes(1.75f, 50f, 2f)
   };
 
-  private static Dictionary<int, PowAttributes> projSpeedLevels = new Dictionary<int, PowAttributes> {
-    { 1, new PowAttributes(1f, 30f, 1.5f) },
-    { 2, new PowAttributes(1.5f, 40f, 1.75f) },
-    { 3, new PowAttributes(1.75f, 50f, 2f) }
+  private static PowAttributes[] projSpeedLevels = {
+    new PowAttributes(1f, 30f, 1.5f),
+    new PowAttributes(1.5f, 40f, 1.75f),
+    new PowAttributes(1.75f, 50f, 2f)
   };
 
   // Note: normal element changes do not need durations nor effect multipliers
-  private static Dictionary<int, PowAttributes> waterChangeLevels = new Dictionary<int, PowAttributes> {
-    { 1, new PowAttributes(1f, 30f, 1f) },
-    { 2, new PowAttributes(1.5f, 0f, 1f) },
-    { 3, new PowAttributes(1.75f, 50f, 1f) }
+  private static PowAttributes[] waterChangeLevels = {
+    new PowAttributes(1f, 30f, 1f),
+    new PowAttributes(1.5f, 0f, 1f),
+    new PowAttributes(1.75f, 50f, 1f)
   };
 
-  private static Dictionary<int, PowAttributes> fireChangeLevels = new Dictionary<int, PowAttributes> {
-    { 1, new PowAttributes(1f, 30f, 1f) },
-    { 2, new PowAttributes(1.5f, 0f, 1f) },
-    { 3, new PowAttributes(1.75f, 50f, 1f) }
+  private static PowAttributes[] fireChangeLevels = {
+    new PowAttributes(1f, 30f, 1f),
+    new PowAttributes(1.5f, 0f, 1f),
+    new PowAttributes(1.75f, 50f, 1f)
   };
 
-  private static Dictionary<int, PowAttributes> woodChangeLevels = new Dictionary<int, PowAttributes> {
-    { 1, new PowAttributes(1f, 30f, 1f) },
-    { 2, new PowAttributes(1.5f, 0f, 1f) },
-    { 3, new PowAttributes(1.75f, 50f, 1f) }
+  private static PowAttributes[] woodChangeLevels = {
+    new PowAttributes(1f, 30f, 1f),
+    new PowAttributes(1.5f, 0f, 1f),
+    new PowAttributes(1.75f, 50f, 1f)
   };
 
-  private static Dictionary<int, PowAttributes> earthChangeLevels = new Dictionary<int, PowAttributes> {
-    { 1, new PowAttributes(1f, 30f, 1f) },
-    { 2, new PowAttributes(1.5f, 0f, 1f) },
-    { 3, new PowAttributes(1.75f, 50f, 1f) }
+  private static PowAttributes[] earthChangeLevels = {
+    new PowAttributes(1f, 30f, 1f),
+    new PowAttributes(1.5f, 0f, 1f),
+    new PowAttributes(1.75f, 50f, 1f)
   };
 
-  private static Dictionary<int, PowAttributes> metalChangeLevels = new Dictionary<int, PowAttributes> {
-    { 1, new PowAttributes(1f, 30f, 1f) },
-    { 2, new PowAttributes(1.5f, 0f, 1f) },
-    { 3, new PowAttributes(1.75f, 50f, 1f) }
+  private static PowAttributes[] metalChangeLevels = {
+    new PowAttributes(1f, 30f, 1f),
+    new PowAttributes(1.5f, 0f, 1f),
+    new PowAttributes(1.75f, 50f, 1f)
   };
 
-  private static Dictionary<int, PowAttributes> holyChangeLevels = new Dictionary<int, PowAttributes> {
-    { 1, new PowAttributes(1f, 30f, 1.5f) },
-    { 2, new PowAttributes(1.5f, 40f, 1.75f) },
-    { 3, new PowAttributes(1.75f, 50f, 2f) }
+  private static PowAttributes[] holyChangeLevels = {
+    new PowAttributes(1f, 30f, 1.5f),
+    new PowAttributes(1.5f, 40f, 1.75f),
+    new PowAttributes(1.75f, 50f, 2f)
   };
 
-  private static Dictionary<int, PowAttributes> slowEnemyLevels = new Dictionary<int, PowAttributes> {
-    { 1, new PowAttributes(1f, 30f, 1.5f) },
-    { 2, new PowAttributes(1.5f, 40f, 1.75f) },
-    { 3, new PowAttributes(1.75f, 50f, 2f) }
+  private static PowAttributes[] slowEnemyLevels = {
+    new PowAttributes(1f, 30f, 1.5f),
+    new PowAttributes(1.5f, 40f, 1.75f),
+    new PowAttributes(1.75f, 50f, 2f)
   };
 
-  private Dictionary< powType, Dictionary<int, PowAttributes> > PowData = new Dictionary<powType, Dictionary<int, PowAttributes>> {
+  private Dictionary< powType, PowAttributes[] > PowData = new Dictionary<powType, PowAttributes[]> {
     { powType.projRad, projRadLevels },
     { powType.explosionRad, explosionRadLevels },
     { powType.damage, damageLevels },

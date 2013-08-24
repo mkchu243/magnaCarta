@@ -28,11 +28,10 @@ public class Cannon : MonoBehaviour {
   private Vector3 cannonEnd;          // the shooting end of the cannon
   private Vector3 target;             // the target to shoot towards
   private Timer coolTimer;               // the cooldown timer for shooting
-  private Element elem;                  // the element to fire
+  private Element element;                  // the element to fire
   private float projInitRad;
 
   // Materials
-  public static System.Random rng;
   private Material cannonMat;
 
   void Awake () {
@@ -45,7 +44,6 @@ public class Cannon : MonoBehaviour {
 	  pivotPoint = new Vector3(transform.position.x - transform.localScale.y, transform.position.y, transform.position.z);
     coolTimer = gameObject.AddComponent<Timer>();
 
-    rng = new System.Random();
     cannonMat = Resources.Load("Materials/cannonMat") as Material;
   }
 
@@ -63,7 +61,7 @@ public class Cannon : MonoBehaviour {
         if(Mathf.Abs(finalAngle - transform.eulerAngles.z) < tolerance) {
           if(fireReady && coolTimer.TheTime <= 0) {  // If player chose to fire, will shoot
             finalAngle = transform.eulerAngles.z;
-            Shoot(target, elem);
+            Shoot(target, element);
           }
         }
         else {
@@ -111,27 +109,10 @@ public class Cannon : MonoBehaviour {
     Rotate(aim); // Rotates the cannon to "aim" the projectile
 
     // TODO include element into firing input
-    float rand = (float)(6 * rng.NextDouble());
-    if( rand < 1 ) {
-      elem = Element.water;
-    }
-    else if( rand < 2 ) {
-      elem = Element.fire;
-    }
-    else if( rand < 3 ) {
-      elem = Element.wood;
-    }
-    else if( rand < 4 ) {
-      elem = Element.earth;
-    }
-    else if( rand < 5 ) {
-      elem = Element.metal;
-    }
-    else {
-      elem = Element.holy;
-    }
+    // Also shouldn't use PowerUpManager's method, but it's only temporary
+    element = PowerUpManager.Instance.RandomElement();
 
-    ChangeMat(Reference.elements[elem].mat);
+    ChangeMat(Reference.elements[element].mat);
   }
   
 
@@ -162,7 +143,7 @@ public class Cannon : MonoBehaviour {
   }
 
 
-  public void CreateExplosion(Element elem, Vector3 pos) {
+  public void CreateExplosion(Element element, Vector3 pos) {
     Explosion ex;
 
     // Obtains an available Explosion
@@ -174,7 +155,7 @@ public class Cannon : MonoBehaviour {
     }
     
     activeExplosion.Add(ex);  // Key needed to keep track of active explosions
-    ex.Spawn(elem, pos, this);
+    ex.Spawn(element, pos, this);
   }
 
 

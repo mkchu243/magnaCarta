@@ -10,14 +10,14 @@ public class PowerUp : MonoBehaviour {
   private PowerUpManager powManager;
 
   // PowerUp information
-  private float duration;
-  private int level;
-  private PowerUpManager.powType powType;
-  private bool isBuff;
-  private Element element;
+  private float duration;                  // Duration of effect
+  private int level;                       // Level of PowerUp
+  private PowerUpManager.powType powType;  // Type of PowerUp
+  private bool isBuff;                     // Tells whether it is a buff or debuff
+  private Element element;                 // Element needed to obtain it?
   
-  private float speed;
-  private bool isMoving;
+  private float speed;                     // Movement speed of the PowerUp
+  private bool isMoving;                   // Says whether it is moving or hanging in the player's GUI
 
   void Awake() {
     powManager = PowerUpManager.Instance;
@@ -70,14 +70,26 @@ public class PowerUp : MonoBehaviour {
   }
 
   private void setModel() {
+    transform.FindChild("waterModel").gameObject.SetActive(false);
+    transform.FindChild("fireModel").gameObject.SetActive(false);
+    transform.FindChild("woodModel").gameObject.SetActive(false);
+    transform.FindChild("earthModel").gameObject.SetActive(false);
+    transform.FindChild("metalModel").gameObject.SetActive(false);
     switch (element) { //TODO the other elements
       case Element.water:
         transform.FindChild("waterModel").gameObject.SetActive(true);
-        transform.FindChild("fireModel").gameObject.SetActive(false);
         break;
       case Element.fire:
-        transform.FindChild("waterModel").gameObject.SetActive(false);
         transform.FindChild("fireModel").gameObject.SetActive(true);
+        break;
+      case Element.wood:
+        transform.FindChild("woodModel").gameObject.SetActive(true);
+        break;
+      case Element.earth:
+        transform.FindChild("earthModel").gameObject.SetActive(true);
+        break;
+      case Element.metal:
+        transform.FindChild("metalModel").gameObject.SetActive(true);
         break;
     }
   }
