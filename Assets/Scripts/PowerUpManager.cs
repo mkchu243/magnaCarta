@@ -7,6 +7,7 @@ public class PowerUpManager : MonoBehaviour {
   public enum powType{ projRad, explosionRad, damage, cooldown, rotSpeed, projSpeed, waterChange, fireChange,
     woodChange, earthChange, metalChange, holyChange, slowEnemy };
 
+  public const float KillX = -27f;
   public const float SpawnX = 30;  // What X Value to spawn at
   private float spawnChance = 0.5f;  // The percentage chance to spawn, in decimal
   private const float spawnInterval = 1; // The Timer interval when another PowerUp may spawn
@@ -39,6 +40,11 @@ public class PowerUpManager : MonoBehaviour {
   public void Restart() {
     numInEffect = 0;
     spawnTimer.Restart(spawnInterval);
+
+    foreach( PowerUp powUp in activePow ) {
+      powUp.Reload();
+    }
+    activePow.Clear();
   }
 	
 	// Update is called once per frame
@@ -108,7 +114,9 @@ public class PowerUpManager : MonoBehaviour {
   }
 
   public void Reload(PowerUp pow) {
-    activePow.Remove(pow);
+    if( GameManager.state != GameManager.GameState.restart ) {
+      activePow.Remove(pow);
+    }
     inactivePow.Push(pow);
   }
 

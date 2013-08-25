@@ -4,7 +4,6 @@ using System.Collections.Generic;
 public class PowerUp : MonoBehaviour {
   // Constants
   private const float baseSpeed = -5.0f;
-  private const float KillX = -27f;
   private const float rotSpeed = 150f;
 
   private PowerUpManager powManager;
@@ -36,7 +35,7 @@ public class PowerUp : MonoBehaviour {
         if( isMoving ) {
           transform.Translate(new Vector3(speed * Time.deltaTime, 0, 0), Space.World);
 
-          if(transform.position.x <= KillX) {
+          if(transform.position.x <= PowerUpManager.KillX) {
             Reload();
           }
         }
@@ -94,7 +93,7 @@ public class PowerUp : MonoBehaviour {
     }
   }
 
-  private void Reload() {
+  public void Reload() {
     gameObject.SetActive(false);
     powManager.Reload(this);
   }
