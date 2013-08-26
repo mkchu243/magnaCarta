@@ -42,10 +42,76 @@ public abstract class Enemy : MonoBehaviour {
 
   void OnTriggerEnter(Collider other) {
     if (other.gameObject.tag == "explosion") {
-      Debug.Log("TODO handle this");
+			
+			//Tells current Enemy Element
+	  Debug.Log(element);
+	 
+			//Should add 2x Damage for Weaknesses
+	switch(other.gameObject.GetComponent<Explosion>().ExploElem){
+	  case(Element.water):     //If Water projectile
+		if(Reference.elements[element].weakness.Contains(Element.water)){
+	      Debug.Log("This Enemy is weak to Water");
+	      health = health - Projectile.BaseDamageWater * 2;
+	      break;
+		}
+		health = health - Projectile.BaseDamageWater;  //norm attack
+		break;
+	  case(Element.fire):      //If Fire projectile
+		if(Reference.elements[element].weakness.Contains(Element.fire)){
+		  Debug.Log("This Enemy is weak to Fire");
+	      health = health - Projectile.BaseDamageFire * 2;
+		  break;	    
+		}
+		health = health - Projectile.BaseDamageFire;   //norm attack
+		break;
+      case(Element.wood):      //If Wood projectile
+		if(Reference.elements[element].weakness.Contains(Element.wood)){
+		  Debug.Log("This Enemy is weak to Wood");
+		  health = health - Projectile.BaseDamageWood * 2;
+		  break;	   
+		}
+		health = health - Projectile.BaseDamageWood;   //norm attack
+		break;
+	  case(Element.earth):     //If Earth projectile
+		if(Reference.elements[element].weakness.Contains(Element.earth)){
+		  Debug.Log("This Enemy is weak to Earth");
+		  health = health - Projectile.BaseDamageEarth * 2;
+		  break;
+		}
+		health = health - Projectile.BaseDamageEarth;  //norm attack
+		break;
+	  case(Element.metal):     //If Metal projectile
+		if(Reference.elements[element].weakness.Contains(Element.metal)){
+		  Debug.Log("This Enemy is weak to Metal");
+		  health = health - Projectile.BaseDamageMetal * 2;
+		  break;
+		}
+		health = health - Projectile.BaseDamageMetal;  //norm attack
+		break;
+	  case(Element.holy):     //If Holy projectile
+		if(Reference.elements[element].weakness.Contains(Element.holy)){
+		  Debug.Log("This Enemy is weak to Holy");
+		  health = health - Projectile.BaseDamageHoly * 2;
+		  break;
+		}
+		health = health - Projectile.BaseDamageHoly;  //norm attack
+		break;
+	  }			
+			
+	        //prints out health (testing purposes)   
+	  Debug.Log ("health is "+health);
+			
+		    //Kills when dead, score++
+	  if(health <= 0) {
+	    Die();
+//		Player.AddScore();
+	  }
+	
+	  return;
     }
   }
-
+	
+	
   //setters and getter
   //done this way so it can inherit these stats and use generic spawn method
   public virtual float GetBaseSpeed() { return -5; }
