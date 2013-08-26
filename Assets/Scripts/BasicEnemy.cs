@@ -27,6 +27,6 @@ public class BasicEnemy : Enemy {
 
   //setters and getter
   public override float GetBaseSpeed() { return -5; }
-  public override float GetBaseHealth() { return 10; }
+  public override float GetBaseHealth() { return 100; }
   public override float GetBasePoints() { return 100; }
 }
