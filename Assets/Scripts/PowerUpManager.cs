@@ -2,12 +2,48 @@
 using System.Collections.Generic;
 
 public class PowerUpManager : MonoBehaviour {
+  // Singleton
   private static PowerUpManager instance;
+
   // The PowerUp types
   public enum powType{ projRad, explosionRad, damage, cooldown, rotSpeed, projSpeed, waterChange, fireChange,
     woodChange, earthChange, metalChange, holyChange, slowEnemy };
 
+  private delegate void PowDelegates( PowerUp powUp );
+  private static PowDelegates[] activeDelegates = {
+    ProjRad,
+    ExplosionRad,
+    Damage,
+    Cooldown,
+    RotSpeed,
+    ProjSpeed,
+    WaterChange,
+    FireChange,
+    WoodChange,
+    EarthChange,
+    MetalChange,
+    HolyChange,
+    SlowEnemy
+  };
+
+  private static PowDelegates[] deactiveDelegates = {
+    ProjRadDe,
+    ExplosionRadDe,
+    DamageDe,
+    CooldownDe,
+    RotSpeedDe,
+    ProjSpeedDe,
+    WaterChangeDe,
+    FireChangeDe,
+    WoodChangeDe,
+    EarthChangeDe,
+    MetalChangeDe,
+    HolyChangeDe,
+    SlowEnemyDe
+  };
+
   public const float KillX = -27f;
+  public const float MaxY = 14.5f;
   public const float SpawnX = 30;  // What X Value to spawn at
   private float spawnChance = 0.5f;  // The percentage chance to spawn, in decimal
   private const float spawnInterval = 1; // The Timer interval when another PowerUp may spawn
@@ -16,10 +52,12 @@ public class PowerUpManager : MonoBehaviour {
   public PowerUp powPrefab;
   private Stack<PowerUp> inactivePow;
   private HashSet<PowerUp> activePow;
+  private HashSet<PowerUp> effectivePow;
   private Timer spawnTimer;
 
   private int numInEffect;      // Number of powerups in play
   private Vector3 powPosition;  // Probably be moved later, for holding powerups
+  private float powWidth;
 
   private System.Random rng;
 
@@ -27,10 +65,13 @@ public class PowerUpManager : MonoBehaviour {
     instance = this; 
     inactivePow = new Stack<PowerUp>();
     activePow = new HashSet<PowerUp>();
-    powPosition = new Vector3(0f,0f,0f);
+    effectivePow = new HashSet<PowerUp>();
+    powPosition = new Vector3(-25f, 18f, 10f );
     rng = new System.Random();
     spawnTimer = gameObject.AddComponent<Timer>();
+    powWidth = 2 * Mathf.Cos(30 * Mathf.Deg2Rad);
 
+    InitPowUp();
   }
 
 	// Use this for initialization
@@ -41,10 +82,16 @@ public class PowerUpManager : MonoBehaviour {
     numInEffect = 0;
     spawnTimer.Restart(spawnInterval);
 
+    // Reloads active PowerUps
     foreach( PowerUp powUp in activePow ) {
       powUp.Reload();
     }
     activePow.Clear();
+
+    // Resets effective PowerUps
+    foreach(PowerUp powUp in effectivePow) {
+      Deactivate(powUp);
+    }
   }
 	
 	// Update is called once per frame
@@ -61,6 +108,10 @@ public class PowerUpManager : MonoBehaviour {
         break;
     }
 	}
+
+  private void InitPowUp() {
+    Cannon.ProjRadPowUp = 1f;
+  }
 
   private void SpawnPowUp() {
     PowerUp powUp;
@@ -84,8 +135,23 @@ public class PowerUpManager : MonoBehaviour {
                 element,
                 PowData[type][level-1].speedMult,
                 PowData[type][level-1].duration,
-                new Vector3(SpawnX, (float)(39 * rng.NextDouble() - 18), 0f),
+                new Vector3(SpawnX, (float)( MaxY * (2 * rng.NextDouble() - 1) ), 0f),
                 isBuff);
+  }
+
+  public void Activate( PowerUp powUp ) {
+    PowDelegates ad = activeDelegates[(int)powUp.Type];
+    powUp.Move( (powPosition + numInEffect * (new Vector3(powWidth, 0, 0))) );
+    ad( powUp );
+    effectivePow.Add(powUp);
+  }
+
+  public void Deactivate( PowerUp powUp ) {
+    PowDelegates dd = deactiveDelegates[(int)powUp.Type];
+    dd( powUp );
+    if( GameManager.state != GameManager.GameState.restart ) {
+      effectivePow.Remove(powUp);
+    }
   }
 
   public Element RandomElement() {
@@ -113,11 +179,93 @@ public class PowerUpManager : MonoBehaviour {
     return element;
   }
 
-  public void Reload(PowerUp pow) {
+  public void Reload(PowerUp powUp) {
     if( GameManager.state != GameManager.GameState.restart ) {
-      activePow.Remove(pow);
+      activePow.Remove(powUp);
     }
-    inactivePow.Push(pow);
+    inactivePow.Push(powUp);
+  }
+  
+  ///////////////////////////  PowerUp Activations /////////////////////////
+  private static void ProjRad( PowerUp powUp ) {
+    Cannon.ProjRadPowUp = PowData[powUp.Type][powUp.Level-1].effectMult;
+  }
+
+  private static void ExplosionRad( PowerUp powUp ) {
+  }
+
+  private static void Damage( PowerUp powUp ) {
+  }
+
+  private static void Cooldown( PowerUp powUp ) {
+  }
+
+  private static void RotSpeed( PowerUp powUp ) {
+  }
+
+  private static void ProjSpeed( PowerUp powUp ) {
+  }
+
+  private static void WaterChange( PowerUp powUp ) {
+  }
+
+  private static void FireChange( PowerUp powUp ) {
+  }
+
+  private static void WoodChange( PowerUp powUp ) {
+  }
+
+  private static void EarthChange( PowerUp powUp ) {
+  }
+
+  private static void MetalChange( PowerUp powUp ) {
+  }
+
+  private static void HolyChange( PowerUp powUp ) {
+  }
+
+  private static void SlowEnemy( PowerUp powUp ) {
+  }
+
+  ///////////////////////////  PowerUp Deactivations /////////////////////////
+  private static void ProjRadDe( PowerUp powUp ) {
+    Cannon.ProjRadPowUp = 1f;
+  }
+
+  private static void ExplosionRadDe( PowerUp powUp ) {
+  }
+
+  private static void DamageDe( PowerUp powUp ) {
+  }
+
+  private static void CooldownDe( PowerUp powUp ) {
+  }
+
+  private static void RotSpeedDe( PowerUp powUp ) {
+  }
+
+  private static void ProjSpeedDe( PowerUp powUp ) {
+  }
+
+  private static void WaterChangeDe( PowerUp powUp ) {
+  }
+
+  private static void FireChangeDe( PowerUp powUp ) {
+  }
+
+  private static void WoodChangeDe( PowerUp powUp ) {
+  }
+
+  private static void EarthChangeDe( PowerUp powUp ) {
+  }
+
+  private static void MetalChangeDe( PowerUp powUp ) {
+  }
+
+  private static void HolyChangeDe( PowerUp powUp ) {
+  }
+
+  private static void SlowEnemyDe( PowerUp powUp ) {
   }
 
   ///////////////////////////  Properties  //////////////////////////
@@ -231,7 +379,7 @@ public class PowerUpManager : MonoBehaviour {
     new PowAttributes(1.75f, 50f, 2f)
   };
 
-  private Dictionary< powType, PowAttributes[] > PowData = new Dictionary<powType, PowAttributes[]> {
+  private static Dictionary< powType, PowAttributes[] > PowData = new Dictionary<powType, PowAttributes[]> {
     { powType.projRad, projRadLevels },
     { powType.explosionRad, explosionRadLevels },
     { powType.damage, damageLevels },

@@ -29,10 +29,13 @@ public class Cannon : MonoBehaviour {
   private Vector3 target;             // the target to shoot towards
   private Timer coolTimer;               // the cooldown timer for shooting
   private Element element;                  // the element to fire
-  private float projInitRad;
+  private const float projInitRad = 1f;
 
   // Materials
   private Material cannonMat;
+
+  // PowerUp Variables
+  private static float projRadPowUp;
 
   void Awake () {
     inactiveProj = new Stack<Projectile>();
@@ -96,7 +99,6 @@ public class Cannon : MonoBehaviour {
     // Reset angles
     transform.RotateAround( pivotPoint, Vector3.forward, zeroRotation - transform.eulerAngles.z );
     finalAngle = zeroRotation;  // set so the cannon doesn't rotate in the beginning
-    projInitRad = 1f;
   }
 
 
@@ -134,7 +136,8 @@ public class Cannon : MonoBehaviour {
 
     activeProj.Add(proj);
 
-    proj.transform.localScale = new Vector3(projInitRad, projInitRad, projInitRad);
+    float rad = projInitRad * projRadPowUp;
+    proj.SetRad(rad);
     ChangeMat(cannonMat);
 
     proj.Spawn(element, cannonEnd, Trajectory, this);
@@ -143,7 +146,7 @@ public class Cannon : MonoBehaviour {
   }
 
 
-  public void CreateExplosion(Element element, Vector3 pos) {
+  public void CreateExplosion(Element element, Vector3 pos, Projectile proj) {
     Explosion ex;
 
     // Obtains an available Explosion
@@ -155,7 +158,7 @@ public class Cannon : MonoBehaviour {
     }
     
     activeExplosion.Add(ex);  // Key needed to keep track of active explosions
-    ex.Spawn(element, pos, this);
+    ex.Spawn(element, pos, proj);
   }
 
 
@@ -244,5 +247,10 @@ public class Cannon : MonoBehaviour {
     get {
       return new Vector3( cannonEnd.x - transform.position.x, cannonEnd.y - transform.position.y, 0f );
     }
+  }
+
+  public static float ProjRadPowUp {
+    get { return projRadPowUp; }
+    set { projRadPowUp = value; }
   }
 }

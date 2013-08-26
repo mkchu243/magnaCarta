@@ -7,11 +7,12 @@ public class PowerUp : MonoBehaviour {
   private const float rotSpeed = 150f;
 
   private PowerUpManager powManager;
+  private Timer powTimer;
 
   // PowerUp information
   private float duration;                  // Duration of effect
   private int level;                       // Level of PowerUp
-  private PowerUpManager.powType powType;  // Type of PowerUp
+  private PowerUpManager.powType type;  // Type of PowerUp
   private bool isBuff;                     // Tells whether it is a buff or debuff
   private Element element;                 // Element needed to obtain it?
   
@@ -20,6 +21,7 @@ public class PowerUp : MonoBehaviour {
 
   void Awake() {
     powManager = PowerUpManager.Instance;
+    powTimer = gameObject.AddComponent<Timer>();
   }
 
 	// Use this for initialization
@@ -39,13 +41,23 @@ public class PowerUp : MonoBehaviour {
             Reload();
           }
         }
+        else {
+          if( powTimer.TheTime <= 0 ) {
+            Deactivate();
+          }
+        }
         break;
     }
 	}
 
+  void OnTriggerEnter() {
+    if( isMoving ) {
+      Activate();
+    }
+  }
 
-  public void Spawn(PowerUpManager.powType type, int lev, Element elem, float speedMult, float dur, Vector3 pos, bool buff) {
-    powType = type;
+  public void Spawn(PowerUpManager.powType t, int lev, Element elem, float speedMult, float dur, Vector3 pos, bool buff) {
+    type = t;
     level = lev;
     element = elem;
     speed = speedMult * baseSpeed;
@@ -63,9 +75,20 @@ public class PowerUp : MonoBehaviour {
 
   
   private void Activate() {
-    powManager.NumInEffect++;
     isMoving = false;
-    
+    powTimer.Restart(duration);
+    powManager.Activate(this);
+    powManager.NumInEffect++;
+  }
+
+  public void Deactivate() {
+    powManager.Deactivate(this);
+    Reload();
+    powManager.NumInEffect--;
+  }
+
+  public void Move(Vector3 pos) {
+    transform.Translate( pos - transform.position, Space.World );
   }
 
   private void setModel() {
@@ -74,6 +97,7 @@ public class PowerUp : MonoBehaviour {
     transform.FindChild("woodModel").gameObject.SetActive(false);
     transform.FindChild("earthModel").gameObject.SetActive(false);
     transform.FindChild("metalModel").gameObject.SetActive(false);
+    transform.FindChild("holyModel").gameObject.SetActive(false);
     switch (element) { //TODO the other elements
       case Element.water:
         transform.FindChild("waterModel").gameObject.SetActive(true);
@@ -89,6 +113,9 @@ public class PowerUp : MonoBehaviour {
         break;
       case Element.metal:
         transform.FindChild("metalModel").gameObject.SetActive(true);
+        break;
+      case Element.holy:
+        transform.FindChild("holyModel").gameObject.SetActive(true);
         break;
     }
   }
@@ -107,8 +134,8 @@ public class PowerUp : MonoBehaviour {
     get { return level; }
   }
 
-  public PowerUpManager.powType PowType {
-    get { return powType; }
+  public PowerUpManager.powType Type {
+    get { return type; }
   }
 
   public bool IsBuff {

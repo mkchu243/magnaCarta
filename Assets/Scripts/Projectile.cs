@@ -39,7 +39,7 @@ public class Projectile : MonoBehaviour {
 
   void OnTriggerEnter(Collider other) {
     if( other.gameObject.GetType() != typeof( Explosion ) ) {
-      cannon.CreateExplosion(element, transform.position);
+      cannon.CreateExplosion(element, transform.position, this);
       Reload();
     }
   }
@@ -55,9 +55,18 @@ public class Projectile : MonoBehaviour {
 
   }
 
+  public void SetRad(float rad) {
+    transform.localScale = new Vector3(rad, rad, rad);
+  }
+
   public void Reload() {
     gameObject.SetActive(false);
     cannon.Reload(this);
+  }
+
+  //////////////////////////  Properties  ////////////////////////////
+  public Cannon Cannon {
+    get { return cannon; }
   }
 
   //Proj Info

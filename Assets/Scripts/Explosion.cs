@@ -34,7 +34,7 @@ public class Explosion : MonoBehaviour {
     }
 	}
 
-  public void Spawn(Element e, Vector3 pos, Cannon c) {
+  public void Spawn(Element e, Vector3 pos, Projectile p) {
     gameObject.SetActive(true);
     transform.position = pos;
 
@@ -45,7 +45,8 @@ public class Explosion : MonoBehaviour {
     maxRad = Projectile.projData[e].explosionRadius;
     gameObject.transform.localScale = new Vector3(initRad, 0.25f, initRad);
     transform.renderer.material = Reference.elements[e].mat;
-    cannon = c;
+    initRad = p.transform.localScale.x;
+    cannon = p.Cannon;
 
     speed = 1f;  // TODO edit for element speed of growth
   }
