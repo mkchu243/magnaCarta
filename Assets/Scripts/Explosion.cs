@@ -10,6 +10,9 @@ public class Explosion : MonoBehaviour {
   private float speed;
   private Cannon cannon; // Needs to know so explosion can recycle
 
+  // PowerUp Variables
+  private static float explosionRadPowUp;
+
   void Awake() {
     transform.Rotate(new Vector3(90, 0, 0));
     lifeTimer = gameObject.AddComponent<Timer>();
@@ -41,11 +44,10 @@ public class Explosion : MonoBehaviour {
     duration = Projectile.projData[e].explosionDuration;
     lifeTimer.Restart(duration);
 
-    initRad = 1f;
-    maxRad = Projectile.projData[e].explosionRadius;
+    initRad = p.transform.localScale.x;
+    maxRad = Projectile.projData[e].explosionRadius * explosionRadPowUp;
     gameObject.transform.localScale = new Vector3(initRad, 0.25f, initRad);
     transform.renderer.material = Reference.elements[e].mat;
-    initRad = p.transform.localScale.x;
     cannon = p.Cannon;
 
     speed = 1f;  // TODO edit for element speed of growth
@@ -54,5 +56,11 @@ public class Explosion : MonoBehaviour {
   public void Reload() {
     gameObject.SetActive(false);
     cannon.Reload(this);
+  }
+
+  ////////////////////////////  Properties  /////////////////////////////
+  public static float ExplosionRadPowUp {
+    get { return explosionRadPowUp; }
+    set { explosionRadPowUp = value; }
   }
 }

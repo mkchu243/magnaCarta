@@ -8,6 +8,11 @@ public class Projectile : MonoBehaviour {
   private Cannon cannon; //needs to know this so it can recycle projectile
 
   public const float KillX = 30f;
+  private const float initRad = 1f;
+
+  // PowerUp Variables
+  private static float radPowUp;
+  private static float speedPowUp;
 
   void Awake() {
     explodeTimer = gameObject.AddComponent<Timer>();
@@ -21,7 +26,7 @@ public class Projectile : MonoBehaviour {
 	void Update () {
     switch( GameManager.state ) {
       case GameManager.GameState.running:
-        transform.Translate( projData[element].speed * Time.deltaTime * traj, Space.World );
+        transform.Translate( projData[element].speed * speedPowUp * Time.deltaTime * traj, Space.World );
 
         if( transform.position.x > KillX ) {
           Reload();
@@ -53,9 +58,11 @@ public class Projectile : MonoBehaviour {
     cannon = c;
     transform.renderer.material = Reference.elements[element].mat;
 
+    float rad = initRad * radPowUp;
+    SetRad(rad);
   }
 
-  public void SetRad(float rad) {
+  private void SetRad(float rad) {
     transform.localScale = new Vector3(rad, rad, rad);
   }
 
@@ -69,7 +76,16 @@ public class Projectile : MonoBehaviour {
     get { return cannon; }
   }
 
-  //Proj Info
+  public static float RadPowUp {
+    get { return radPowUp; }
+    set { radPowUp = value; }
+  }
+  public static float SpeedPowUp {
+    get { return speedPowUp; }
+    set { speedPowUp = value; }
+  }
+
+  ////////////////////////////  Projectile Data  ////////////////////////////
   public const float BaseSpeedWater = 7.0f;
   public const float BaseSpeedFire = 7.0f;
   public const float BaseSpeedWood = 7.0f;
@@ -90,7 +106,7 @@ public class Projectile : MonoBehaviour {
   public const float BaseExplosionDuration1 = 2;
   public static Dictionary<Element, ProjectileAttributes> projData =
   new Dictionary<Element, ProjectileAttributes>{
-      {Element.water, new ProjectileAttributes(BaseSpeedWater, BaseDamageWater, BaseExplosionRadius,     BaseExplosionDuration1)},
+      {Element.water, new ProjectileAttributes(BaseSpeedWater, BaseDamageWater,  BaseExplosionRadius,     BaseExplosionDuration1)},
       {Element.fire,  new ProjectileAttributes(BaseSpeedFire,  BaseDamageFire,  BaseExplosionRadius,     BaseExplosionDuration1)},
       {Element.wood,  new ProjectileAttributes(BaseSpeedWood,  BaseDamageWood,  BaseExplosionRadius,     BaseExplosionDuration1)},
       {Element.earth,  new ProjectileAttributes(BaseSpeedEarth,  BaseDamageEarth,  BaseExplosionRadius,     BaseExplosionDuration1)},

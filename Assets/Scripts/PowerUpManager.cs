@@ -57,6 +57,7 @@ public class PowerUpManager : MonoBehaviour {
 
   private int numInEffect;      // Number of powerups in play
   private Vector3 powPosition;  // Probably be moved later, for holding powerups
+  private const float powRotZ = 30;
   private float powWidth;
 
   private System.Random rng;
@@ -69,9 +70,9 @@ public class PowerUpManager : MonoBehaviour {
     powPosition = new Vector3(-25f, 18f, 10f );
     rng = new System.Random();
     spawnTimer = gameObject.AddComponent<Timer>();
-    powWidth = 2 * Mathf.Cos(30 * Mathf.Deg2Rad);
+    powWidth = 2 * Mathf.Cos(powRotZ * Mathf.Deg2Rad);
 
-    InitPowUp();
+    InitializePowUp();
   }
 
 	// Use this for initialization
@@ -93,9 +94,23 @@ public class PowerUpManager : MonoBehaviour {
       Deactivate(powUp);
     }
   }
+
+  /**
+   * Initializes all PowerUp Variables
+   */
+  private void InitializePowUp() {
+    Projectile.RadPowUp = 1f;
+    Explosion.ExplosionRadPowUp = 1f;
+    Cannon.CoolPowUp = 1f;
+    Cannon.RotPowUp = 1f;
+    Projectile.SpeedPowUp = 1f;
+  }
 	
-	// Update is called once per frame
-	void Update () {
+	/**
+   * Update is called once per frame.  Update will spawn a PowerUp depending on
+   * the spawnTimer and chance of spawning one
+   */
+  void Update () {
     switch( GameManager.state ) {
       case GameManager.GameState.running:
         if( spawnTimer.TheTime <= 0 ) {
@@ -109,10 +124,10 @@ public class PowerUpManager : MonoBehaviour {
     }
 	}
 
-  private void InitPowUp() {
-    Cannon.ProjRadPowUp = 1f;
-  }
-
+  /**
+   * Spawns a PowerUp on the map.  Type, buff status, and element should be
+   * randomized
+   */
   private void SpawnPowUp() {
     PowerUp powUp;
     if( inactivePow.Count > 0 ) {
@@ -139,6 +154,11 @@ public class PowerUpManager : MonoBehaviour {
                 isBuff);
   }
 
+  /**
+   * Activates a PowerUp
+   *
+   * @param powUp the PowerUp to activate
+   */
   public void Activate( PowerUp powUp ) {
     PowDelegates ad = activeDelegates[(int)powUp.Type];
     powUp.Move( (powPosition + numInEffect * (new Vector3(powWidth, 0, 0))) );
@@ -146,6 +166,11 @@ public class PowerUpManager : MonoBehaviour {
     effectivePow.Add(powUp);
   }
 
+  /**
+   * Deactivates a PowerUp
+   *
+   * @param powUp the PowerUp to deactivate
+   */
   public void Deactivate( PowerUp powUp ) {
     PowDelegates dd = deactiveDelegates[(int)powUp.Type];
     dd( powUp );
@@ -154,6 +179,9 @@ public class PowerUpManager : MonoBehaviour {
     }
   }
 
+  /**
+   * Returns a random element
+   */
   public Element RandomElement() {
     float rand = (float)(6 * rng.NextDouble());
     Element element;
@@ -188,84 +216,108 @@ public class PowerUpManager : MonoBehaviour {
   
   ///////////////////////////  PowerUp Activations /////////////////////////
   private static void ProjRad( PowerUp powUp ) {
-    Cannon.ProjRadPowUp = PowData[powUp.Type][powUp.Level-1].effectMult;
+    Projectile.RadPowUp = PowData[powUp.Type][powUp.Level-1].effectMult;
   }
 
   private static void ExplosionRad( PowerUp powUp ) {
+    Explosion.ExplosionRadPowUp = PowData[powUp.Type][powUp.Level-1].effectMult;
   }
 
   private static void Damage( PowerUp powUp ) {
+    Debug.Log("TODO handle this");
   }
 
   private static void Cooldown( PowerUp powUp ) {
+    Cannon.CoolPowUp = PowData[powUp.Type][powUp.Level-1].effectMult;
   }
 
   private static void RotSpeed( PowerUp powUp ) {
+    Cannon.RotPowUp = PowData[powUp.Type][powUp.Level-1].effectMult;
   }
 
   private static void ProjSpeed( PowerUp powUp ) {
+    Projectile.SpeedPowUp = PowData[powUp.Type][powUp.Level-1].effectMult;
   }
 
   private static void WaterChange( PowerUp powUp ) {
+    Debug.Log("TODO handle this");
   }
 
   private static void FireChange( PowerUp powUp ) {
+    Debug.Log("TODO handle this");
   }
 
   private static void WoodChange( PowerUp powUp ) {
+    Debug.Log("TODO handle this");
   }
 
   private static void EarthChange( PowerUp powUp ) {
+    Debug.Log("TODO handle this");
   }
 
   private static void MetalChange( PowerUp powUp ) {
+    Debug.Log("TODO handle this");
   }
 
   private static void HolyChange( PowerUp powUp ) {
+    Debug.Log("TODO handle this");
   }
 
   private static void SlowEnemy( PowerUp powUp ) {
+    Debug.Log("TODO handle this");
   }
 
   ///////////////////////////  PowerUp Deactivations /////////////////////////
   private static void ProjRadDe( PowerUp powUp ) {
-    Cannon.ProjRadPowUp = 1f;
+    Projectile.RadPowUp = 1f;
   }
 
   private static void ExplosionRadDe( PowerUp powUp ) {
+    Explosion.ExplosionRadPowUp = 1f;
   }
 
   private static void DamageDe( PowerUp powUp ) {
+    Debug.Log("TODO handle this");
   }
 
   private static void CooldownDe( PowerUp powUp ) {
+    Cannon.CoolPowUp = 1f;
   }
 
   private static void RotSpeedDe( PowerUp powUp ) {
+    Cannon.RotPowUp = 1f;
   }
 
   private static void ProjSpeedDe( PowerUp powUp ) {
+    Projectile.SpeedPowUp = 1f;
   }
 
   private static void WaterChangeDe( PowerUp powUp ) {
+    Debug.Log("TODO handle this");
   }
 
   private static void FireChangeDe( PowerUp powUp ) {
+    Debug.Log("TODO handle this");
   }
 
   private static void WoodChangeDe( PowerUp powUp ) {
+    Debug.Log("TODO handle this");
   }
 
   private static void EarthChangeDe( PowerUp powUp ) {
+    Debug.Log("TODO handle this");
   }
 
   private static void MetalChangeDe( PowerUp powUp ) {
+    Debug.Log("TODO handle this");
   }
 
   private static void HolyChangeDe( PowerUp powUp ) {
+    Debug.Log("TODO handle this");
   }
 
   private static void SlowEnemyDe( PowerUp powUp ) {
+    Debug.Log("TODO handle this");
   }
 
   ///////////////////////////  Properties  //////////////////////////

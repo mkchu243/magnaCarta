@@ -29,13 +29,13 @@ public class Cannon : MonoBehaviour {
   private Vector3 target;             // the target to shoot towards
   private Timer coolTimer;               // the cooldown timer for shooting
   private Element element;                  // the element to fire
-  private const float projInitRad = 1f;
 
   // Materials
   private Material cannonMat;
 
-  // PowerUp Variables
-  private static float projRadPowUp;
+  // PowerUp variables
+  private static float coolPowUp;
+  private static float rotPowUp;
 
   void Awake () {
     inactiveProj = new Stack<Projectile>();
@@ -68,7 +68,7 @@ public class Cannon : MonoBehaviour {
           }
         }
         else {
-          transform.RotateAround(pivotPoint, Vector3.forward, rotDirection * rotSpeed * Time.deltaTime);
+          transform.RotateAround(pivotPoint, Vector3.forward, rotDirection * rotSpeed * rotPowUp * Time.deltaTime);
           if( AngleAdjust(Mathf.Abs(finalAngle - transform.eulerAngles.z)) > angleDiff ) {
             rotDirection *= -1;
           }
@@ -136,16 +136,16 @@ public class Cannon : MonoBehaviour {
 
     activeProj.Add(proj);
 
-    float rad = projInitRad * projRadPowUp;
-    proj.SetRad(rad);
     ChangeMat(cannonMat);
 
     proj.Spawn(element, cannonEnd, Trajectory, this);
     fireReady = false;
-    coolTimer.Restart(maxCool);
+    coolTimer.Restart(maxCool / coolPowUp);
   }
 
-
+  /**
+   * Creates an explosion from its stack
+   */
   public void CreateExplosion(Element element, Vector3 pos, Projectile proj) {
     Explosion ex;
 
@@ -249,8 +249,14 @@ public class Cannon : MonoBehaviour {
     }
   }
 
-  public static float ProjRadPowUp {
-    get { return projRadPowUp; }
-    set { projRadPowUp = value; }
+  public static float CoolPowUp {
+    get { return coolPowUp; }
+    set { coolPowUp = value; }
   }
+
+  public static float RotPowUp {
+    get { return rotPowUp; }
+    set { rotPowUp = value; }
+  }
+
 }
