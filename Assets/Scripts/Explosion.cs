@@ -11,7 +11,7 @@ public class Explosion : MonoBehaviour {
   private Cannon cannon; // Needs to know so explosion can recycle
 
   // PowerUp Variables
-  private static float explosionRadPowUp;
+  private static float radPowUp;
 
   void Awake() {
     transform.Rotate(new Vector3(90, 0, 0));
@@ -45,7 +45,7 @@ public class Explosion : MonoBehaviour {
     lifeTimer.Restart(duration);
 
     initRad = p.transform.localScale.x;
-    maxRad = Projectile.projData[e].explosionRadius * explosionRadPowUp;
+    maxRad = Projectile.projData[e].explosionRadius * radPowUp;
     gameObject.transform.localScale = new Vector3(initRad, 0.25f, initRad);
     transform.renderer.material = Reference.elements[e].mat;
     cannon = p.Cannon;
@@ -59,8 +59,8 @@ public class Explosion : MonoBehaviour {
   }
 
   ////////////////////////////  Properties  /////////////////////////////
-  public static float ExplosionRadPowUp {
-    get { return explosionRadPowUp; }
-    set { explosionRadPowUp = value; }
+  public static float RadPowUp {
+    get { return radPowUp; }
+    set { radPowUp = value; }
   }
 }

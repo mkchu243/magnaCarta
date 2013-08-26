@@ -100,7 +100,7 @@ public class PowerUpManager : MonoBehaviour {
    */
   private void InitializePowUp() {
     Projectile.RadPowUp = 1f;
-    Explosion.ExplosionRadPowUp = 1f;
+    Explosion.RadPowUp = 1f;
     Cannon.CoolPowUp = 1f;
     Cannon.RotPowUp = 1f;
     Projectile.SpeedPowUp = 1f;
@@ -140,7 +140,7 @@ public class PowerUpManager : MonoBehaviour {
     activePow.Add(powUp);
     
     // TODO randomize these
-    powType type = powType.projRad;
+    powType type = RandPowType();
     int level = 2;
     bool isBuff = true;   // It's a buff not a debuff
     Element element = RandomElement();
@@ -207,6 +207,56 @@ public class PowerUpManager : MonoBehaviour {
     return element;
   }
 
+  /**
+   * Generates a random PowerUp type
+   */
+  private powType RandPowType() {
+    float rand = (float)(13 * rng.NextDouble());
+    powType type;
+
+    if( rand < 1 ) {
+      type = powType.projRad;
+    }
+    else if( rand < 2 ) {
+      type = powType.explosionRad;
+    }
+    else if( rand < 3 ) {
+      type = powType.damage;
+    }
+    else if( rand < 4 ) {
+      type = powType.cooldown;
+    }
+    else if( rand < 5 ) {
+      type = powType.rotSpeed;
+    }
+    else if( rand < 6 ) {
+      type = powType.projSpeed;
+    }
+    else if( rand < 7 ) {
+      type = powType.waterChange;
+    }
+    else if( rand < 8 ) {
+      type = powType.fireChange;
+    }
+    else if( rand < 9 ) {
+      type = powType.woodChange;
+    }
+    else if( rand < 10 ) {
+      type = powType.earthChange;
+    }
+    else if( rand < 11 ) {
+      type = powType.metalChange;
+    }
+    else if( rand < 12 ) {
+      type = powType.holyChange;
+    }
+    else {
+      type = powType.slowEnemy;
+    }
+
+    return type;
+  }
+
   public void Reload(PowerUp powUp) {
     if( GameManager.state != GameManager.GameState.restart ) {
       activePow.Remove(powUp);
@@ -220,7 +270,7 @@ public class PowerUpManager : MonoBehaviour {
   }
 
   private static void ExplosionRad( PowerUp powUp ) {
-    Explosion.ExplosionRadPowUp = PowData[powUp.Type][powUp.Level-1].effectMult;
+    Explosion.RadPowUp = PowData[powUp.Type][powUp.Level-1].effectMult;
   }
 
   private static void Damage( PowerUp powUp ) {
@@ -273,7 +323,7 @@ public class PowerUpManager : MonoBehaviour {
   }
 
   private static void ExplosionRadDe( PowerUp powUp ) {
-    Explosion.ExplosionRadPowUp = 1f;
+    Explosion.RadPowUp = 1f;
   }
 
   private static void DamageDe( PowerUp powUp ) {
