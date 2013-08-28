@@ -1,14 +1,16 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 public class Projectile : MonoBehaviour {
-  private Timer explodeTimer;
+  private Stopwatch explodeTimer;
+  private float explodeTime;
   private Element element;
   private float speed;
   private Cannon cannon; //needs to know this so it can recycle explosion
 
   void Awake() {
-    explodeTimer = gameObject.AddComponent<Timer>();
+    explodeTimer = new Stopwatch();
   }
 
 	// Use this for initialization
@@ -17,7 +19,7 @@ public class Projectile : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-    if (explodeTimer.time <= 0) {
+    if (explodeTimer.Elapsed.Seconds >= explodeTime) {
       cannon.getExplosion().Spawn(element, transform.position);
       gameObject.SetActive(false);
     }
@@ -25,7 +27,9 @@ public class Projectile : MonoBehaviour {
 
   public void Spawn(Element e, Vector3 aim, Cannon c) {
     gameObject.SetActive(true);
-    explodeTimer.Restart(0.25f);
+    explodeTime = 0.25f; //TODO hard coded number
+    explodeTimer.Reset();
+    explodeTimer.Start();
     element = e;
     transform.position = aim;
     cannon = c;

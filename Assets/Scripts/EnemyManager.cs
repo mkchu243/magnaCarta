@@ -1,6 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
-using System;
+using System.Diagnostics;
 
 public class EnemyManager : MonoBehaviour {
   private static EnemyManager instance; 
@@ -18,6 +18,7 @@ public class EnemyManager : MonoBehaviour {
   private const float FinalSpawnTime = 1;
   
   //game vars
+  private bool startSpawn;
   private float spawnAttributeRatio = 0.5f;
   private float speedMult;
   private float spawnTime;
@@ -32,7 +33,7 @@ public class EnemyManager : MonoBehaviour {
   private HashSet<Enemy> activeEnemies;
 
   private System.Random rng;
-  private Timer spawnTimer;
+  private Stopwatch spawnTimer;
 
   void Awake() {
     Instance = this;
@@ -44,7 +45,7 @@ public class EnemyManager : MonoBehaviour {
     inactiveBasicEnemies = new Stack<BasicEnemy>();
     inactiveTestEnemies = new Stack<TestEnemy>();
     
-    spawnTimer = gameObject.AddComponent<Timer>();
+    spawnTimer = new Stopwatch();
     rng = new System.Random();
 	}
 	
@@ -53,9 +54,11 @@ public class EnemyManager : MonoBehaviour {
     switch (GameManager.state){
       case GameManager.GameState.running:
         //spawn new enemies
-        if (spawnTimer.time <= 0){
+        if (spawnTimer.Elapsed.Seconds >= spawnTime || startSpawn){
           SpawnEnemies();
-          spawnTimer.Restart(spawnTime);
+          spawnTimer.Reset();
+          spawnTimer.Start();
+          startSpawn = false;
         }
         break;
     }
@@ -68,7 +71,8 @@ public class EnemyManager : MonoBehaviour {
     }
     activeEnemies.Clear();
 
-    spawnTimer.Restart(0);
+    startSpawn = true;
+    spawnTimer.Reset();
     speedMult = InitialSpeedMult;
     spawnTime = InitialSpawnTime;
   }

@@ -8,10 +8,11 @@ public abstract class Enemy : MonoBehaviour {
   protected float speed;
   protected float health;
   protected float points;
-
+  protected List<Ailment> ailments;
+	
 	// Use this for initialization
-	protected virtual void Start () {
-	}
+  protected virtual void Start () {
+  }
 	
 	// Update is called once per frame
 	protected virtual void Update () {
@@ -27,7 +28,7 @@ public abstract class Enemy : MonoBehaviour {
   }
 
   public void Spawn(Element elem, float speedMult, Vector3 pos) {
-    element = elem;
+    element = elem;   
     speed = speedMult * GetBaseSpeed();
     health = GetBaseHealth(); //TODO health mult?, point Mult?
     points = GetBasePoints();
@@ -45,7 +46,9 @@ public abstract class Enemy : MonoBehaviour {
     if (other.gameObject.tag == "explosion") {
       float damageMult = 1;
       Element exploElem = other.gameObject.GetComponent<Explosion>().ExploElem;
-      if( Reference.elements[element].weakness.Contains(exploElem)){ //it is my weakness
+      if (exploElem == element) {
+        damageMult = 0;
+      } else if (Reference.elements[element].weakness.Contains(exploElem)) { //it is my weakness
         damageMult = 2;
       }
       health -= Projectile.projData[exploElem].damage * damageMult;
