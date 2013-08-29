@@ -5,18 +5,24 @@ using System.Collections.Generic;
 public enum Element { water, wood, fire, earth, metal, holy };
 
 public struct ElementAttributes{
-  public HashSet<Element> weakness; //NOTE do we even need this?
-  public HashSet<Element> strength;
+  public HashSet<Element> weakness;
+  public HashSet<Element> strength; //NOTE do we even need this?
   public HashSet<Element> creates;
+  public ailmentType ailment;
 
-  public ElementAttributes(HashSet<Element> weakness, HashSet<Element> strength, HashSet<Element> creates){
+  public ElementAttributes(HashSet<Element> weakness,
+                           HashSet<Element> strength,
+                           HashSet<Element> creates,
+                           ailmentType ailment){
     this.weakness = weakness;
     this.strength = strength;
     this.creates = creates;
+    this.ailment = ailment;
   }
 }
 
 static class Reference {
+  //the weakness of that element
   public static HashSet<Element> WeaknessWater = new HashSet<Element> { Element.earth, Element.holy };
   public static HashSet<Element> WeaknessFire  = new HashSet<Element> { Element.water, Element.holy };
   public static HashSet<Element> WeaknessWood  = new HashSet<Element> { Element.metal, Element.holy };
@@ -31,22 +37,21 @@ static class Reference {
   public static HashSet<Element> StrengthMetal = new HashSet<Element> { Element.wood };
   public static HashSet<Element> StrengthHoly  = new HashSet<Element> { Element.water, Element.wood, Element.fire, Element.metal, Element.earth};
 	
+  //what that element creates
   public static HashSet<Element> CreateWater = new HashSet<Element> { Element.wood  };
   public static HashSet<Element> CreateFire  = new HashSet<Element> { Element.earth };
   public static HashSet<Element> CreateWood  = new HashSet<Element> { Element.fire  };
   public static HashSet<Element> CreateEarth = new HashSet<Element> { Element.metal };
   public static HashSet<Element> CreateMetal = new HashSet<Element> { Element.water };
   public static HashSet<Element> CreateHoly  = new HashSet<Element> { };
-	
+
   public static Dictionary<Element, ElementAttributes> elements =
     new Dictionary<Element, ElementAttributes>{
-    { Element.water , new ElementAttributes(WeaknessWater, StrengthWater, CreateWater) },
-    { Element.fire  , new ElementAttributes(WeaknessFire,  StrengthFire,  CreateFire) },
-    { Element.wood  , new ElementAttributes(WeaknessWood,  StrengthWood,  CreateWood) },
-    { Element.earth , new ElementAttributes(WeaknessEarth, StrengthEarth, CreateEarth) },
-    { Element.metal , new ElementAttributes(WeaknessMetal, StrengthMetal, CreateMetal) },
-    { Element.holy  , new ElementAttributes(WeaknessHoly,  StrengthHoly,  CreateHoly) }
+    { Element.water , new ElementAttributes(WeaknessWater, StrengthWater, CreateWater, ailmentType.freeze) }, //TODO make ailments match
+    { Element.fire  , new ElementAttributes(WeaknessFire,  StrengthFire,  CreateFire,  ailmentType.freeze) },
+    { Element.wood  , new ElementAttributes(WeaknessWood,  StrengthWood,  CreateWood,  ailmentType.freeze) },
+    { Element.earth , new ElementAttributes(WeaknessEarth, StrengthEarth, CreateEarth, ailmentType.freeze) },
+    { Element.metal , new ElementAttributes(WeaknessMetal, StrengthMetal, CreateMetal, ailmentType.freeze) },
+    { Element.holy  , new ElementAttributes(WeaknessHoly,  StrengthHoly,  CreateHoly,  ailmentType.freeze) }
   };
-
-  //TODO the other elements
 }

@@ -93,9 +93,9 @@ public class EnemyManager : MonoBehaviour {
 
     //generate behavior
     Element elem;
-    if (rng.NextDouble() > spawnAttributeRatio)
-      elem = Element.water;
-    else
+   // if (rng.NextDouble() > spawnAttributeRatio)
+   //   elem = Element.water;
+   // else
       elem = Element.fire;
 
     e.Spawn(elem, speedMult, new Vector3(SpawnX, UnityEngine.Random.Range(MinY, MaxY), 0));

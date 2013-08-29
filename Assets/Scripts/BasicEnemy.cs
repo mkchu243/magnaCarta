@@ -7,7 +7,7 @@ public class BasicEnemy : Enemy {
     switch (GameManager.state) {
       case GameManager.GameState.running:
         //move, attack, etc
-        transform.Translate(new Vector3(speed * Time.deltaTime, 0, 0), Space.World);
+        transform.Translate(new Vector3(speed * ailSpeedMult * Time.deltaTime, 0, 0), Space.World);
         break;
     }
   }
