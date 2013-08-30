@@ -13,16 +13,18 @@ public abstract class Enemy : MonoBehaviour {
   protected float ailSpeedMult;
 
   protected Dictionary<ailmentType, Ailment> ailments;
+  protected Dictionary<ailmentType, GameObject> particles;
 	
 	// Use this for initialization
   protected virtual void Start () {
     ailments = new Dictionary<ailmentType, Ailment>();
+    particles = new Dictionary<ailmentType, GameObject>();
   }
 	
 	// Update is called once per frame
 	protected virtual void Update () {
-    Vector3 rotationVelocity = new Vector3(45, 90, 1);
-    transform.Rotate(rotationVelocity * Time.deltaTime);
+    //Vector3 rotationVelocity = new Vector3(45, 90, 1);
+    //transform.Rotate(rotationVelocity * Time.deltaTime);
 
     switch( GameManager.state ){
       case GameManager.GameState.running:
@@ -50,12 +52,18 @@ public abstract class Enemy : MonoBehaviour {
     setModel();
   }
 
+  //set object to no longer render
+  //calling EnemyManager.Instance.RemoveEnemy modifies player life, etc
+  //and also calls this method
   public void Die() {
     gameObject.SetActive(false);
   }
  
   //uses the physics clock, so it should be stable across all platforms
   void OnTriggerStay(Collider other) {
+    if (GameManager.state != GameManager.GameState.running)
+      return;
+
     if (other.gameObject.tag == "explosion") {
       Explosion explo = other.gameObject.GetComponent<Explosion>();
       Element exploElem = explo.ExploElem;
@@ -72,8 +80,7 @@ public abstract class Enemy : MonoBehaviour {
       health -= Projectile.projData[exploElem].damage * damageMult;
       
       if(health <= 0){
-        Die();
-        //TODO update the score
+        EnemyManager.Instance.RemoveEnemy(this);
       }
     }
   }
@@ -81,10 +88,9 @@ public abstract class Enemy : MonoBehaviour {
   private void addAilment(ailmentType atype, int level) {
     if (!ailments.ContainsKey(atype)) {
       ailments.Add(atype, new Ailment(atype, level)); //TODO level 1 always so dont need to update
+      activeDelegates[(int)atype](ailments[atype], this);
+      ailments[atype].RestartClock();
     }
-
-    activeDelegates[(int)atype](ailments[atype], this);
-    ailments[atype].RestartClock();
   }
 
   private void updateAilments() {
@@ -95,10 +101,8 @@ public abstract class Enemy : MonoBehaviour {
     }
 
     foreach (ailmentType a in toRemove) {
-      UnityEngine.Debug.Log("removing");
-      Ailment ailment = ailments[a];
       ailments.Remove(a);
-      deactiveDelegates[(int)a](ailment, this);
+      deactiveDelegates[(int)a](a, this);
     }
   }
 
@@ -126,23 +130,33 @@ public abstract class Enemy : MonoBehaviour {
 
   /////////ailment delegates
   private delegate void AilDelegates(Ailment a, Enemy e);
+  private delegate void DeAilDelegates(ailmentType a, Enemy e);
 
   private static AilDelegates[] activeDelegates = {
     Freeze
   };
 
-  private static AilDelegates[] deactiveDelegates = {
+  private static DeAilDelegates[] deactiveDelegates = {
     FreezeDe
   };
 
   ////////activations////////
+  //a is the ailment being applied, e is the enemy it is being applied to
   private static void Freeze(Ailment a, Enemy e) {
-    //add the particle model
     RecalculateAilSpeedMult(e);
+
+    GameObject part = ParticleManager.Instance.CreateAilBurn();
+    part.transform.position = e.transform.position;
+    part.transform.parent = e.transform;
+    e.particles.Add(a.Type, part);
   }
 
   ///////deactivations/////////
-  private static void FreezeDe(Ailment a, Enemy e) {
+  //probably only need the type
+  private static void FreezeDe(ailmentType a, Enemy e) {
     RecalculateAilSpeedMult(e);
+    GameObject part = e.particles[a];
+    ParticleManager.Instance.ReleaseAilBurn(part);
+    e.particles.Remove(a);
   }
 }

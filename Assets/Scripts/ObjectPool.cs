@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public class ObjectPool<T> where T : MonoBehaviour {
+public class ObjectPool<T> where T : Object {
   private Stack<T> inactivePool;
   private HashSet<T> activePool;
   private int maxSize;
@@ -22,10 +22,16 @@ public class ObjectPool<T> where T : MonoBehaviour {
   //gives an instance of the object, or else returns null if hit max size
   public T PoolCreate(){
     T ret = null;
-    if (inactivePool.Count > 0) //pop if you can
+    if (inactivePool.Count > 0) { //pop if you can
       ret = inactivePool.Pop();
-    else if ( activePool.Count < maxSize ){                      //if you can't just make one
+    } else if (activePool.Count < maxSize) {                      //if you can't just make one
       ret = (T)UnityEngine.Object.Instantiate(prefab, new Vector3(0f, 0f, -100f), Quaternion.identity);
+    } else {
+      Debug.LogWarning("pool hit max size");
+    }
+
+    if (ret) {
+      activePool.Add(ret);
     }
     return ret;
   }

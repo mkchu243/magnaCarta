@@ -11,10 +11,10 @@ public class EnemyManager : MonoBehaviour {
   public const float MinY = -18;
   
   private const int NumEnemies = 20;
-  
+
   private const float InitialSpeedMult = 1;
   private const float FinalSpeedMult = 5;
-  private const float InitialSpawnTime = 3;
+  private const float InitialSpawnTime = 1;//3;
   private const float FinalSpawnTime = 1;
   
   //game vars
@@ -28,9 +28,7 @@ public class EnemyManager : MonoBehaviour {
   public TestEnemy testEnemyPrefab;
 
   //vars
-  private Stack<BasicEnemy> inactiveBasicEnemies;
-  private Stack<TestEnemy> inactiveTestEnemies;
-  private HashSet<Enemy> activeEnemies;
+  private ObjectPool<BasicEnemy> basicPool;
 
   private System.Random rng;
   private Stopwatch spawnTimer;
@@ -40,10 +38,8 @@ public class EnemyManager : MonoBehaviour {
   }
 
 	// Use this for initialization
-	void Start() {    
-    activeEnemies = new HashSet<Enemy>();
-    inactiveBasicEnemies = new Stack<BasicEnemy>();
-    inactiveTestEnemies = new Stack<TestEnemy>();
+	void Start() {
+    basicPool = new ObjectPool<BasicEnemy>(basicEnemyPrefab);
     
     spawnTimer = new Stopwatch();
     rng = new System.Random();
@@ -66,10 +62,10 @@ public class EnemyManager : MonoBehaviour {
   
   public void Restart() {
     //reclaim enemies
-    foreach (Enemy e in activeEnemies) {
-      reclaimEnemy(e);
+    foreach (BasicEnemy e in basicPool.ActivePool) {
+      e.Die();
     }
-    activeEnemies.Clear();
+    basicPool.Clear();
 
     startSpawn = true;
     spawnTimer.Reset();
@@ -79,15 +75,15 @@ public class EnemyManager : MonoBehaviour {
 
   public void RemoveEnemy(Enemy e) {
     Player.Instance.handleEnemy(e);
+    e.Die();
     reclaimEnemy(e);
-    activeEnemies.Remove(e);
   }
     
   private void SpawnEnemies() {
     Enemy e;
     //generate enemy
 //    if (rng.NextDouble() > 0.5f)
-      e = popBasicEnemy();
+      e = basicPool.PoolCreate();
  //   else
  //     e = popTestEnemy();
 
@@ -98,42 +94,18 @@ public class EnemyManager : MonoBehaviour {
    // else
       elem = Element.fire;
 
-    e.Spawn(elem, speedMult, new Vector3(SpawnX, UnityEngine.Random.Range(MinY, MaxY), 0));
-    activeEnemies.Add(e);
+    if(e)
+      e.Spawn(elem, speedMult, new Vector3(SpawnX, UnityEngine.Random.Range(MinY, MaxY), 0));
   }
 
 ////RECYCLE ENEMY METHODS
   //push the enemy to the right stack
   private void reclaimEnemy(Enemy e) {
-    e.Die();
     if (e.GetType() == typeof(BasicEnemy)) {
-      inactiveBasicEnemies.Push((BasicEnemy)e);
+      basicPool.PoolRelease((BasicEnemy)e);
     } else if (e.GetType() == typeof(TestEnemy)) {
-      inactiveTestEnemies.Push((TestEnemy)e);
+      //inactiveTestEnemies.Push((TestEnemy)e);
     }
-  }
-
-  //get a basic enemy or create one if there are no inactive ones
-  private BasicEnemy popBasicEnemy() {
-    BasicEnemy ret;
-    if (inactiveBasicEnemies.Count > 0) //pop if you can
-      ret = inactiveBasicEnemies.Pop();
-    else {                              //if you can't just make one
-      ret = (BasicEnemy)Instantiate(basicEnemyPrefab, new Vector3(0f, 0f, -100f), Quaternion.identity);
-      ret.transform.parent = transform;
-    }
-    return ret;
-  }
-
-  private TestEnemy popTestEnemy() {
-    TestEnemy ret;
-    if (inactiveTestEnemies.Count > 0) {
-      ret = inactiveTestEnemies.Pop();
-    }  else {
-      ret = (TestEnemy)Instantiate(testEnemyPrefab, new Vector3(0f, 0f, -100f), Quaternion.identity);
-      ret.transform.parent = transform;
-    }
-    return ret;
   }
 
   //setters and getters
