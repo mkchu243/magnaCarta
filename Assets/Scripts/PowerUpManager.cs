@@ -52,12 +52,14 @@ public class PowerUpManager : MonoBehaviour {
   public PowerUp powPrefab;
   private Stack<PowerUp> inactivePow;
   private HashSet<PowerUp> activePow;
-  private HashSet<PowerUp> effectivePow;
+  //private HashSet<PowerUp> effectivePow;
+  private Dictionary<int, PowerUp> effectivePow;
   private Timer spawnTimer;
 
   private int numInEffect;      // Number of powerups in play
   private Vector3 powPosition;  // Probably be moved later, for holding powerups
   private const float powRotZ = 30;
+  private const float powHeight = 2f;
   private float powWidth;
 
   private System.Random rng;
@@ -66,11 +68,12 @@ public class PowerUpManager : MonoBehaviour {
     instance = this; 
     inactivePow = new Stack<PowerUp>();
     activePow = new HashSet<PowerUp>();
-    effectivePow = new HashSet<PowerUp>();
-    powPosition = new Vector3(-25f, 18f, 10f );
+    //effectivePow = new HashSet<PowerUp>();
+    effectivePow = new Dictionary<int, PowerUp>();
+    powPosition = new Vector3(-24f, 18f, 10f );
     rng = new System.Random();
     spawnTimer = gameObject.AddComponent<Timer>();
-    powWidth = 2 * Mathf.Cos(powRotZ * Mathf.Deg2Rad);
+    powWidth = powHeight * Mathf.Cos(powRotZ * Mathf.Deg2Rad);
 
     InitializePowUp();
   }
@@ -90,9 +93,16 @@ public class PowerUpManager : MonoBehaviour {
     activePow.Clear();
 
     // Resets effective PowerUps
-    foreach(PowerUp powUp in effectivePow) {
-      Deactivate(powUp);
+    int count = effectivePow.Count;
+    for(int i = 0; count > 0; i++) {
+      if( effectivePow.ContainsKey(i) ) {
+        Deactivate( effectivePow[i] );
+        effectivePow.Remove(i);
+      }
     }
+    //foreach(int key in effectivePow) {
+    //  Deactivate(effectivePow[key]);
+    //}
   }
 
   /**
@@ -140,7 +150,8 @@ public class PowerUpManager : MonoBehaviour {
     activePow.Add(powUp);
     
     // TODO randomize these
-    powType type = RandPowType();
+    //powType type = RandPowType();
+    powType type = powType.projRad;
     int level = 2;
     bool isBuff = true;   // It's a buff not a debuff
     Element element = RandomElement();
@@ -161,9 +172,11 @@ public class PowerUpManager : MonoBehaviour {
    */
   public void Activate( PowerUp powUp ) {
     PowDelegates ad = activeDelegates[(int)powUp.Type];
-    powUp.Move( (powPosition + numInEffect * (new Vector3(powWidth, 0, 0))) );
+    int key = effectivePow.Count;
+    powUp.Move( (powPosition + key * (new Vector3(powWidth, 0, 0))) );
     ad( powUp );
-    effectivePow.Add(powUp);
+    effectivePow.Add( key, powUp);
+    powUp.Key = key;
   }
 
   /**
@@ -175,7 +188,29 @@ public class PowerUpManager : MonoBehaviour {
     PowDelegates dd = deactiveDelegates[(int)powUp.Type];
     dd( powUp );
     if( GameManager.state != GameManager.GameState.restart ) {
-      effectivePow.Remove(powUp);
+      effectivePow.Remove(powUp.Key);
+    }
+
+    ShiftPowUps(powUp.Key);
+  }
+
+  /**
+   * Shift the PowerUps down after one has been removed.
+   *
+   * @param key the key to the PowerUp that was most recently removed
+   */
+  private void ShiftPowUps( int key ) {
+    PowerUp powUp;
+    /* Start with the PowerUp after key
+     * Go up until we reach the count+1 (for the removed PowerUp)
+     * Increment individually
+     */
+    for( int i = key + 1; i < effectivePow.Count+1; i++ ) {
+      powUp = effectivePow[i];
+      powUp.Key = i-1;
+      effectivePow.Add(powUp.Key, powUp);
+      effectivePow.Remove(i);
+      powUp.Move( ( powPosition + powUp.Key * (new Vector3(powWidth, 0, 0))) );
     }
   }
 
@@ -184,27 +219,8 @@ public class PowerUpManager : MonoBehaviour {
    */
   public Element RandomElement() {
     float rand = (float)(6 * rng.NextDouble());
-    Element element;
-    if( rand < 1 ) {
-      element = Element.water;
-    }
-    else if( rand < 2 ) {
-      element = Element.fire;
-    }
-    else if( rand < 3 ) {
-      element = Element.wood;
-    }
-    else if( rand < 4 ) {
-      element = Element.earth;
-    }
-    else if( rand < 5 ) {
-      element = Element.metal;
-    }
-    else {
-      element = Element.holy;
-    }
-
-    return element;
+    
+    return (Element) rand;
   }
 
   /**
@@ -212,49 +228,8 @@ public class PowerUpManager : MonoBehaviour {
    */
   private powType RandPowType() {
     float rand = (float)(13 * rng.NextDouble());
-    powType type;
 
-    if( rand < 1 ) {
-      type = powType.projRad;
-    }
-    else if( rand < 2 ) {
-      type = powType.explosionRad;
-    }
-    else if( rand < 3 ) {
-      type = powType.damage;
-    }
-    else if( rand < 4 ) {
-      type = powType.cooldown;
-    }
-    else if( rand < 5 ) {
-      type = powType.rotSpeed;
-    }
-    else if( rand < 6 ) {
-      type = powType.projSpeed;
-    }
-    else if( rand < 7 ) {
-      type = powType.waterChange;
-    }
-    else if( rand < 8 ) {
-      type = powType.fireChange;
-    }
-    else if( rand < 9 ) {
-      type = powType.woodChange;
-    }
-    else if( rand < 10 ) {
-      type = powType.earthChange;
-    }
-    else if( rand < 11 ) {
-      type = powType.metalChange;
-    }
-    else if( rand < 12 ) {
-      type = powType.holyChange;
-    }
-    else {
-      type = powType.slowEnemy;
-    }
-
-    return type;
+    return (powType) rand;
   }
 
   public void Reload(PowerUp powUp) {
@@ -274,7 +249,7 @@ public class PowerUpManager : MonoBehaviour {
   }
 
   private static void Damage( PowerUp powUp ) {
-    Debug.Log("TODO handle this");
+    Debug.Log("TODO handle this PowerUp");
   }
 
   private static void Cooldown( PowerUp powUp ) {
@@ -290,31 +265,31 @@ public class PowerUpManager : MonoBehaviour {
   }
 
   private static void WaterChange( PowerUp powUp ) {
-    Debug.Log("TODO handle this");
+    Debug.Log("TODO handle this PowerUp");
   }
 
   private static void FireChange( PowerUp powUp ) {
-    Debug.Log("TODO handle this");
+    Debug.Log("TODO handle this PowerUp");
   }
 
   private static void WoodChange( PowerUp powUp ) {
-    Debug.Log("TODO handle this");
+    Debug.Log("TODO handle this PowerUp");
   }
 
   private static void EarthChange( PowerUp powUp ) {
-    Debug.Log("TODO handle this");
+    Debug.Log("TODO handle this PowerUp");
   }
 
   private static void MetalChange( PowerUp powUp ) {
-    Debug.Log("TODO handle this");
+    Debug.Log("TODO handle this PowerUp");
   }
 
   private static void HolyChange( PowerUp powUp ) {
-    Debug.Log("TODO handle this");
+    Debug.Log("TODO handle this PowerUp");
   }
 
   private static void SlowEnemy( PowerUp powUp ) {
-    Debug.Log("TODO handle this");
+    Debug.Log("TODO handle this PowerUp");
   }
 
   ///////////////////////////  PowerUp Deactivations /////////////////////////
@@ -327,7 +302,7 @@ public class PowerUpManager : MonoBehaviour {
   }
 
   private static void DamageDe( PowerUp powUp ) {
-    Debug.Log("TODO handle this");
+    Debug.Log("TODO handle this PowerUp");
   }
 
   private static void CooldownDe( PowerUp powUp ) {
@@ -343,31 +318,31 @@ public class PowerUpManager : MonoBehaviour {
   }
 
   private static void WaterChangeDe( PowerUp powUp ) {
-    Debug.Log("TODO handle this");
+    Debug.Log("TODO handle this PowerUp");
   }
 
   private static void FireChangeDe( PowerUp powUp ) {
-    Debug.Log("TODO handle this");
+    Debug.Log("TODO handle this PowerUp");
   }
 
   private static void WoodChangeDe( PowerUp powUp ) {
-    Debug.Log("TODO handle this");
+    Debug.Log("TODO handle this PowerUp");
   }
 
   private static void EarthChangeDe( PowerUp powUp ) {
-    Debug.Log("TODO handle this");
+    Debug.Log("TODO handle this PowerUp");
   }
 
   private static void MetalChangeDe( PowerUp powUp ) {
-    Debug.Log("TODO handle this");
+    Debug.Log("TODO handle this PowerUp");
   }
 
   private static void HolyChangeDe( PowerUp powUp ) {
-    Debug.Log("TODO handle this");
+    Debug.Log("TODO handle this PowerUp");
   }
 
   private static void SlowEnemyDe( PowerUp powUp ) {
-    Debug.Log("TODO handle this");
+    Debug.Log("TODO handle this PowerUp");
   }
 
   ///////////////////////////  Properties  //////////////////////////
@@ -403,9 +378,9 @@ public class PowerUpManager : MonoBehaviour {
   // TODO customize numbers
 
   private static PowAttributes[] projRadLevels = {
-    new PowAttributes(1f, 30f, 1.5f),
-    new PowAttributes(1.5f, 40f, 1.75f),
-    new PowAttributes(1.75f, 50f, 2f)
+    new PowAttributes(1f, 10f, 1.5f),
+    new PowAttributes(1.5f, 10f, 1.75f),
+    new PowAttributes(1.75f, 10f, 2f)
   };
 
   private static PowAttributes[] explosionRadLevels = {

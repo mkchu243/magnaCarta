@@ -538,7 +538,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a85c2c3d28804148b67257df307f351, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  powPrefab: {fileID: 11400000, guid: 39baee5cc3211284d9930bc627108e31, type: 2}
+  powPrefab: {fileID: 11400000, guid: 564d5268b2084ef46bf014a767e42e94, type: 2}
 --- !u!1001 &1987558930
 Prefab:
   m_ObjectHideFlags: 0

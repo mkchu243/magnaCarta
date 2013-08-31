@@ -19,6 +19,8 @@ public class PowerUp : MonoBehaviour {
   private float speed;                     // Movement speed of the PowerUp
   private bool isMoving;                   // Says whether it is moving or hanging in the player's GUI
 
+  private int key;
+
   void Awake() {
     powManager = PowerUpManager.Instance;
     powTimer = gameObject.AddComponent<Timer>();
@@ -140,6 +142,11 @@ public class PowerUp : MonoBehaviour {
 
   public bool IsBuff {
     get { return isBuff; }
+  }
+
+  public int Key {
+    get { return key; }
+    set { key = value; }
   }
 
   public float Speed {
