@@ -80,13 +80,15 @@ public class PowerUp : MonoBehaviour {
     isMoving = false;
     powTimer.Restart(duration);
     powManager.Activate(this);
-    powManager.NumInEffect++;
   }
 
   public void Deactivate() {
     powManager.Deactivate(this);
     Reload();
-    powManager.NumInEffect--;
+  }
+
+  public void ResetTimer() {
+    powTimer.Restart(duration);
   }
 
   public void Move(Vector3 pos) {

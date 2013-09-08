@@ -52,11 +52,9 @@ public class PowerUpManager : MonoBehaviour {
   public PowerUp powPrefab;
   private Stack<PowerUp> inactivePow;
   private HashSet<PowerUp> activePow;
-  //private HashSet<PowerUp> effectivePow;
   private Dictionary<int, PowerUp> effectivePow;
   private Timer spawnTimer;
 
-  private int numInEffect;      // Number of powerups in play
   private Vector3 powPosition;  // Probably be moved later, for holding powerups
   private const float powRotZ = 30;
   private const float powHeight = 2f;
@@ -68,7 +66,6 @@ public class PowerUpManager : MonoBehaviour {
     instance = this; 
     inactivePow = new Stack<PowerUp>();
     activePow = new HashSet<PowerUp>();
-    //effectivePow = new HashSet<PowerUp>();
     effectivePow = new Dictionary<int, PowerUp>();
     powPosition = new Vector3(-24f, 18f, 10f );
     rng = new System.Random();
@@ -83,7 +80,6 @@ public class PowerUpManager : MonoBehaviour {
 	}
 
   public void Restart() {
-    numInEffect = 0;
     spawnTimer.Restart(spawnInterval);
 
     // Reloads active PowerUps
@@ -97,12 +93,9 @@ public class PowerUpManager : MonoBehaviour {
     for(int i = 0; count > 0; i++) {
       if( effectivePow.ContainsKey(i) ) {
         Deactivate( effectivePow[i] );
-        effectivePow.Remove(i);
+        count--;
       }
     }
-    //foreach(int key in effectivePow) {
-    //  Deactivate(effectivePow[key]);
-    //}
   }
 
   /**
@@ -150,8 +143,7 @@ public class PowerUpManager : MonoBehaviour {
     activePow.Add(powUp);
     
     // TODO randomize these
-    //powType type = RandPowType();
-    powType type = powType.projRad;
+    powType type = RandPowType();
     int level = 2;
     bool isBuff = true;   // It's a buff not a debuff
     Element element = RandomElement();
@@ -171,12 +163,19 @@ public class PowerUpManager : MonoBehaviour {
    * @param powUp the PowerUp to activate
    */
   public void Activate( PowerUp powUp ) {
-    PowDelegates ad = activeDelegates[(int)powUp.Type];
-    int key = effectivePow.Count;
-    powUp.Move( (powPosition + key * (new Vector3(powWidth, 0, 0))) );
-    ad( powUp );
-    effectivePow.Add( key, powUp);
-    powUp.Key = key;
+    int key = isEffective(powUp.Type);
+    if( key >= 0 ) {
+      effectivePow[key].ResetTimer();
+      powUp.Reload();
+    }
+    else {
+      PowDelegates ad = activeDelegates[(int)powUp.Type];
+      key = effectivePow.Count;
+      powUp.Move( (powPosition + key * (new Vector3(powWidth, 0, 0))) );
+      ad( powUp );
+      effectivePow.Add( key, powUp );
+      powUp.Key = key;
+    }
   }
 
   /**
@@ -187,11 +186,11 @@ public class PowerUpManager : MonoBehaviour {
   public void Deactivate( PowerUp powUp ) {
     PowDelegates dd = deactiveDelegates[(int)powUp.Type];
     dd( powUp );
+    effectivePow.Remove(powUp.Key);
     if( GameManager.state != GameManager.GameState.restart ) {
-      effectivePow.Remove(powUp.Key);
+      ShiftPowUps(powUp.Key);
     }
 
-    ShiftPowUps(powUp.Key);
   }
 
   /**
@@ -212,6 +211,21 @@ public class PowerUpManager : MonoBehaviour {
       effectivePow.Remove(i);
       powUp.Move( ( powPosition + powUp.Key * (new Vector3(powWidth, 0, 0))) );
     }
+  }
+
+  /**
+   * Method that checks if a powType is effective
+   *
+   * @param type the type to check
+   */
+  public int isEffective( powType type ) {
+    for( int i = 0; i < effectivePow.Count; i++ ) {
+      if( effectivePow[i].Type == type ) {
+        return i;
+      }
+    }
+    
+    return -1;
   }
 
   /**
@@ -249,7 +263,7 @@ public class PowerUpManager : MonoBehaviour {
   }
 
   private static void Damage( PowerUp powUp ) {
-    Debug.Log("TODO handle this PowerUp");
+    Debug.Log("TODO handle this PowerUp activation");
   }
 
   private static void Cooldown( PowerUp powUp ) {
@@ -265,31 +279,31 @@ public class PowerUpManager : MonoBehaviour {
   }
 
   private static void WaterChange( PowerUp powUp ) {
-    Debug.Log("TODO handle this PowerUp");
+    Debug.Log("TODO handle this PowerUp activation");
   }
 
   private static void FireChange( PowerUp powUp ) {
-    Debug.Log("TODO handle this PowerUp");
+    Debug.Log("TODO handle this PowerUp activation");
   }
 
   private static void WoodChange( PowerUp powUp ) {
-    Debug.Log("TODO handle this PowerUp");
+    Debug.Log("TODO handle this PowerUp activation");
   }
 
   private static void EarthChange( PowerUp powUp ) {
-    Debug.Log("TODO handle this PowerUp");
+    Debug.Log("TODO handle this PowerUp activation");
   }
 
   private static void MetalChange( PowerUp powUp ) {
-    Debug.Log("TODO handle this PowerUp");
+    Debug.Log("TODO handle this PowerUp activation");
   }
 
   private static void HolyChange( PowerUp powUp ) {
-    Debug.Log("TODO handle this PowerUp");
+    Debug.Log("TODO handle this PowerUp activation");
   }
 
   private static void SlowEnemy( PowerUp powUp ) {
-    Debug.Log("TODO handle this PowerUp");
+    Debug.Log("TODO handle this PowerUp activation");
   }
 
   ///////////////////////////  PowerUp Deactivations /////////////////////////
@@ -302,7 +316,7 @@ public class PowerUpManager : MonoBehaviour {
   }
 
   private static void DamageDe( PowerUp powUp ) {
-    Debug.Log("TODO handle this PowerUp");
+    Debug.Log("TODO handle this PowerUp deactivation");
   }
 
   private static void CooldownDe( PowerUp powUp ) {
@@ -318,42 +332,37 @@ public class PowerUpManager : MonoBehaviour {
   }
 
   private static void WaterChangeDe( PowerUp powUp ) {
-    Debug.Log("TODO handle this PowerUp");
+    Debug.Log("TODO handle this PowerUp deactivation");
   }
 
   private static void FireChangeDe( PowerUp powUp ) {
-    Debug.Log("TODO handle this PowerUp");
+    Debug.Log("TODO handle this PowerUp deactivation");
   }
 
   private static void WoodChangeDe( PowerUp powUp ) {
-    Debug.Log("TODO handle this PowerUp");
+    Debug.Log("TODO handle this PowerUp deactivation");
   }
 
   private static void EarthChangeDe( PowerUp powUp ) {
-    Debug.Log("TODO handle this PowerUp");
+    Debug.Log("TODO handle this PowerUp deactivation");
   }
 
   private static void MetalChangeDe( PowerUp powUp ) {
-    Debug.Log("TODO handle this PowerUp");
+    Debug.Log("TODO handle this PowerUp deactivation");
   }
 
   private static void HolyChangeDe( PowerUp powUp ) {
-    Debug.Log("TODO handle this PowerUp");
+    Debug.Log("TODO handle this PowerUp deactivation");
   }
 
   private static void SlowEnemyDe( PowerUp powUp ) {
-    Debug.Log("TODO handle this PowerUp");
+    Debug.Log("TODO handle this PowerUp deactivation");
   }
 
   ///////////////////////////  Properties  //////////////////////////
   public static PowerUpManager Instance {
     get { return instance; }
     private set{}
-  }
-
-  public int NumInEffect {
-    get { return numInEffect; }
-    set { numInEffect = value; }
   }
 
   public Vector3 PowPosition {
@@ -378,9 +387,9 @@ public class PowerUpManager : MonoBehaviour {
   // TODO customize numbers
 
   private static PowAttributes[] projRadLevels = {
-    new PowAttributes(1f, 10f, 1.5f),
-    new PowAttributes(1.5f, 10f, 1.75f),
-    new PowAttributes(1.75f, 10f, 2f)
+    new PowAttributes(1f, 30f, 1.5f),
+    new PowAttributes(1.5f, 40f, 1.75f),
+    new PowAttributes(1.75f, 50f, 2f)
   };
 
   private static PowAttributes[] explosionRadLevels = {

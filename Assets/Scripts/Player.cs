@@ -4,7 +4,7 @@ using System;
 
 public class Player : MonoBehaviour {
   private static Player instance;
-  private const float initialLife = 105;
+  private const float initialLife = 5;
 
   private Cannon cannon;
   private float score;
