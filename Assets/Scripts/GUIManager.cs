@@ -8,6 +8,10 @@ public class GUIManager : MonoBehaviour {
   public GUIStyle centerTextStyle;
   private string centerText;
 
+
+  void Awake() {
+  }
+
 	// Use this for initialization
 	void Start () {
     player = gameObject.GetComponent<Player>();

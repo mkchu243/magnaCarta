@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Timer : MonoBehaviour {
 	
-	public float time;
+	private float time;
 	private bool on;
 	
 	// Use this for initialization
@@ -20,5 +20,9 @@ public class Timer : MonoBehaviour {
   public void Restart(float time) {
     this.time = time;
     on = true;
+  }
+
+  public float TheTime {
+    get { return time; }
   }
 }
