@@ -1,7 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Collections.Generic;
 
-public enum ailmentType { freeze, burn, root };
+                         //water fire   wood earth metal
+public enum ailmentType { freeze, burn, root, dam, cut };
 
 public class Ailment{
   private ailmentType type;
@@ -39,27 +40,40 @@ public class Ailment{
     }
   }
 
+  public static HashSet<ailmentType> resetTimer = new HashSet<ailmentType> {
+    ailmentType.freeze, ailmentType.root, ailmentType.dam, ailmentType.burn
+  };
+
   public static HashSet<ailmentType> affectMovement = new HashSet<ailmentType>{
-    ailmentType.freeze, ailmentType.root
+    ailmentType.freeze, ailmentType.root, ailmentType.dam
   };
 
   private static AilmentAttributes[] freezeData = {
-    new AilmentAttributes(0.5f , 1, 0),
-    new AilmentAttributes(0.25f, 2, 0),
-    new AilmentAttributes(0    , 3, 0),
+    new AilmentAttributes(0.5f , 2,    0),
+    new AilmentAttributes(0.25f, 2.5f, 0),
+    new AilmentAttributes(0    , 3,    0),
   };
 
   private static AilmentAttributes[] burnData = {
-    new AilmentAttributes(0, 1, 0),
-    new AilmentAttributes(0, 2, 0),
-    new AilmentAttributes(0, 3, 0),
+    //                    burnClock duration damage
+    new AilmentAttributes(0.05f, 2,    0.20f),
+    new AilmentAttributes(0.10f, 2.5f, 0.25f),
+    new AilmentAttributes(0.10f, 3,    0.30f),
   };
 
-  //TODO the rest of the ailments
+  private static AilmentAttributes[] cutData = {
+    new AilmentAttributes(0, 2,    0.75f),
+    new AilmentAttributes(0, 2.5f, 0.6f),
+    new AilmentAttributes(0, 1,    0.5f),
+  };
+
   public static Dictionary<ailmentType, AilmentAttributes[]> ailmentData =
     new Dictionary<ailmentType, AilmentAttributes[]> {
       {ailmentType.freeze, freezeData},
-      {ailmentType.burn,   burnData}
+      {ailmentType.burn,   burnData},
+      {ailmentType.root,   freezeData},
+      {ailmentType.cut,    cutData},
+      {ailmentType.dam,    freezeData}
     };
 }
 

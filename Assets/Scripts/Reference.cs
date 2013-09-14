@@ -48,10 +48,10 @@ static class Reference {
   public static Dictionary<Element, ElementAttributes> elements =
     new Dictionary<Element, ElementAttributes>{
     { Element.water , new ElementAttributes(WeaknessWater, StrengthWater, CreateWater, ailmentType.freeze) }, //TODO make ailments match
-    { Element.fire  , new ElementAttributes(WeaknessFire,  StrengthFire,  CreateFire,  ailmentType.freeze) },
-    { Element.wood  , new ElementAttributes(WeaknessWood,  StrengthWood,  CreateWood,  ailmentType.freeze) },
-    { Element.earth , new ElementAttributes(WeaknessEarth, StrengthEarth, CreateEarth, ailmentType.freeze) },
-    { Element.metal , new ElementAttributes(WeaknessMetal, StrengthMetal, CreateMetal, ailmentType.freeze) },
-    { Element.holy  , new ElementAttributes(WeaknessHoly,  StrengthHoly,  CreateHoly,  ailmentType.freeze) }
+    { Element.fire  , new ElementAttributes(WeaknessFire,  StrengthFire,  CreateFire,  ailmentType.burn) },
+    { Element.wood  , new ElementAttributes(WeaknessWood,  StrengthWood,  CreateWood,  ailmentType.root) },
+    { Element.earth , new ElementAttributes(WeaknessEarth, StrengthEarth, CreateEarth, ailmentType.cut) },
+    { Element.metal , new ElementAttributes(WeaknessMetal, StrengthMetal, CreateMetal, ailmentType.cut) },
+    { Element.holy  , new ElementAttributes(WeaknessHoly,  StrengthHoly,  CreateHoly,  ailmentType.freeze) } //TODO this shouldnt freeze, but it will never happen
   };
 }
