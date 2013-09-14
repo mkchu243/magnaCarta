@@ -50,8 +50,8 @@ static class Reference {
     { Element.water , new ElementAttributes(WeaknessWater, StrengthWater, CreateWater, ailmentType.freeze) }, //TODO make ailments match
     { Element.fire  , new ElementAttributes(WeaknessFire,  StrengthFire,  CreateFire,  ailmentType.burn) },
     { Element.wood  , new ElementAttributes(WeaknessWood,  StrengthWood,  CreateWood,  ailmentType.root) },
-    { Element.earth , new ElementAttributes(WeaknessEarth, StrengthEarth, CreateEarth, ailmentType.cut) },
-    { Element.metal , new ElementAttributes(WeaknessMetal, StrengthMetal, CreateMetal, ailmentType.cut) },
+    { Element.earth , new ElementAttributes(WeaknessEarth, StrengthEarth, CreateEarth, ailmentType.burn) },
+    { Element.metal , new ElementAttributes(WeaknessMetal, StrengthMetal, CreateMetal, ailmentType.dam) },
     { Element.holy  , new ElementAttributes(WeaknessHoly,  StrengthHoly,  CreateHoly,  ailmentType.freeze) } //TODO this shouldnt freeze, but it will never happen
   };
 }

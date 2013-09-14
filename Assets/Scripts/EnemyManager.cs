@@ -14,14 +14,14 @@ public class EnemyManager : MonoBehaviour {
 
   private const float InitialSpeedMult = 1;
   private const float FinalSpeedMult = 5;
-  private const float InitialSpawnTime = 1;//3;
+  private const int InitialSpawnTime = 1000;//3;
   private const float FinalSpawnTime = 1;
   
   //game vars
-  private bool startSpawn;
+  private bool startSpawn; //flag so there is no waiting time for the first spawn
   private float spawnAttributeRatio = 0.5f;
   private float speedMult;
-  private float spawnTime;
+  private int spawnTime;
 
   //prefabs
   public BasicEnemy basicEnemyPrefab;
@@ -50,7 +50,7 @@ public class EnemyManager : MonoBehaviour {
     switch (GameManager.state){
       case GameManager.GameState.running:
         //spawn new enemies
-        if (spawnTimer.Elapsed.Seconds >= spawnTime || startSpawn){
+        if (spawnTimer.ElapsedMilliseconds >= spawnTime || startSpawn){
           SpawnEnemies();
           spawnTimer.Reset();
           spawnTimer.Start();
@@ -93,7 +93,6 @@ public class EnemyManager : MonoBehaviour {
    //   elem = Element.water;
    // else
       elem = Element.fire;
-
     if(e)
       e.Spawn(elem, speedMult, new Vector3(SpawnX, UnityEngine.Random.Range(MinY, MaxY), 0));
   }

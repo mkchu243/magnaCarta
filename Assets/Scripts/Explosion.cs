@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 public class Explosion : MonoBehaviour {
   private Stopwatch lifeTimer;
-  private float lifeTime;
+  private int lifeTime;
   private Element element;
   private bool applyAilment;
 	
@@ -19,7 +19,7 @@ public class Explosion : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-    if (lifeTimer.Elapsed.Seconds >= lifeTime) {
+    if (lifeTimer.ElapsedMilliseconds >= lifeTime) {
       gameObject.SetActive(false);
     }
 	}

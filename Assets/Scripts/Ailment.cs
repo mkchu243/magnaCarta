@@ -8,7 +8,7 @@ public class Ailment{
   private ailmentType type;
   private int level;
   private Stopwatch lifeTimer;
-  private float lifeTime;
+  private int lifeTime;
 
   public Ailment(ailmentType type, int level) {
     this.type = type;
@@ -25,15 +25,15 @@ public class Ailment{
   //////setters and getters
   public ailmentType Type { get { return type; } }
   public int Level { get { return level; } }
-  public bool IsLive { get { return lifeTimer.Elapsed.Seconds < lifeTime; } }
+  public bool IsLive { get { return lifeTimer.ElapsedMilliseconds < lifeTime; } }
   
   ///////ailment dictionary////////
   public struct AilmentAttributes {
     public float speedMult;
-    public float duration;
+    public int duration;
     public float effectMult;
 
-    public AilmentAttributes(float speedMult, float duration, float effectMult) {
+    public AilmentAttributes(float speedMult, int duration, float effectMult) {
       this.speedMult = speedMult;
       this.duration = duration;
       this.effectMult = effectMult;
@@ -49,22 +49,22 @@ public class Ailment{
   };
 
   private static AilmentAttributes[] freezeData = {
-    new AilmentAttributes(0.5f , 2,    0),
-    new AilmentAttributes(0.25f, 2.5f, 0),
-    new AilmentAttributes(0    , 3,    0),
+    new AilmentAttributes(0.5f , 2000,    0),
+    new AilmentAttributes(0.25f, 2500,    0),
+    new AilmentAttributes(0    , 3000,    0),
   };
 
   private static AilmentAttributes[] burnData = {
     //                    burnClock duration damage
-    new AilmentAttributes(0.05f, 2,    0.20f),
-    new AilmentAttributes(0.10f, 2.5f, 0.25f),
-    new AilmentAttributes(0.10f, 3,    0.30f),
+    new AilmentAttributes(0.20f, 2000,    0.20f),
+    new AilmentAttributes(0.10f, 2500,    0.25f),
+    new AilmentAttributes(0.10f, 3000,    0.30f),
   };
 
   private static AilmentAttributes[] cutData = {
-    new AilmentAttributes(0, 2,    0.75f),
-    new AilmentAttributes(0, 2.5f, 0.6f),
-    new AilmentAttributes(0, 1,    0.5f),
+    new AilmentAttributes(0, 2000,    0.75f),
+    new AilmentAttributes(0, 2500,    0.6f),
+    new AilmentAttributes(0, 1000,    0.5f),
   };
 
   public static Dictionary<ailmentType, AilmentAttributes[]> ailmentData =

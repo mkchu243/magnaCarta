@@ -12,7 +12,7 @@ public abstract class Enemy : MonoBehaviour {
   
   //ailment variables
   protected float ailSpeedMult; //the total speed modifier of all the ailments
-  private float burnTime;
+  private int burnTime;
   private Stopwatch burnClock;
 
   protected Dictionary<ailmentType, Ailment> ailments;
@@ -128,10 +128,11 @@ public abstract class Enemy : MonoBehaviour {
     foreach (ailmentType a in ailments.Keys) {
       if (!ailments[a].IsLive)
         toRemove.Add(a);
-      else if (a == ailmentType.burn && burnClock.Elapsed.Seconds >= 1.0f) {
+      else if (a == ailmentType.burn && burnClock.ElapsedMilliseconds >= burnTime) {
         health -= Ailment.ailmentData[ailmentType.burn][ailments[a].Level].effectMult;
         burnClock.Reset();
         burnClock.Start();
+        UnityEngine.Debug.Log("burn "+ health);
       }
     }
 
@@ -193,7 +194,7 @@ public abstract class Enemy : MonoBehaviour {
       e.burnClock = new Stopwatch();
     }
     e.burnClock.Start();
-    e.burnTime = Ailment.ailmentData[a.Type][a.Level].speedMult;
+    e.burnTime = (int) Ailment.ailmentData[a.Type][a.Level].speedMult * 1000;
   }
   
   private static void Root(Ailment a, Enemy e) {

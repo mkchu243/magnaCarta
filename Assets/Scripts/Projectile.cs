@@ -19,7 +19,7 @@ public class Projectile : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-    if (explodeTimer.Elapsed.Seconds >= explodeTime) {
+    if (explodeTimer.ElapsedMilliseconds >= explodeTime) {
       cannon.getExplosion().Spawn(element, transform.position);
       gameObject.SetActive(false);
     }
@@ -27,7 +27,7 @@ public class Projectile : MonoBehaviour {
 
   public void Spawn(Element e, Vector3 aim, Cannon c) {
     gameObject.SetActive(true);
-    explodeTime = 0.25f; //TODO hard coded number
+    explodeTime = 250; //TODO hard coded number
     explodeTimer.Reset();
     explodeTimer.Start();
     element = e;
@@ -53,7 +53,7 @@ public class Projectile : MonoBehaviour {
   public const float BaseExplosionRadius = 4;
   public const float BaseExplosionRadiusHoly = 5;
 
-  public const float BaseExplosionDuration1 = 2;
+  public const int BaseExplosionDuration1 = 2000;
   public static Dictionary<Element, ProjectileAttributes> projData =
   new Dictionary<Element, ProjectileAttributes>{
       {Element.water, new ProjectileAttributes(BaseSpeedWater, BaseDamageWater, BaseExplosionRadius,     BaseExplosionDuration1)},
@@ -70,12 +70,12 @@ public struct ProjectileAttributes {
   public float speed;
   public float damage;
   public float explosionRadius;
-  public float explosionDuration;
+  public int explosionDuration;
 
   public ProjectileAttributes(float speed,
                               float damage,
                               float explosionRadius,
-                              float explosionDuration) {
+                              int explosionDuration) {
     this.speed = speed;
     this.damage = damage;
     this.explosionRadius = explosionRadius;
