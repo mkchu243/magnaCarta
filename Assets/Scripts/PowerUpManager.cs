@@ -7,7 +7,7 @@ public class PowerUpManager : MonoBehaviour {
 
   // The PowerUp types
   public enum powType{ projRad, explosionRad, damage, cooldown, rotSpeed, projSpeed, waterChange, fireChange,
-    woodChange, earthChange, metalChange, holyChange, slowEnemy };
+    woodChange, earthChange, metalChange, holyChange, slowEnemy, heal};
 
   private delegate void PowDelegates( PowerUp powUp );
   private static PowDelegates[] activeDelegates = {
@@ -23,7 +23,8 @@ public class PowerUpManager : MonoBehaviour {
     EarthChange,
     MetalChange,
     HolyChange,
-    SlowEnemy
+    SlowEnemy,
+    Heal
   };
 
   private static PowDelegates[] deactiveDelegates = {
@@ -39,7 +40,8 @@ public class PowerUpManager : MonoBehaviour {
     EarthChangeDe,
     MetalChangeDe,
     HolyChangeDe,
-    SlowEnemyDe
+    SlowEnemyDe,
+    HealDe
   };
 
   public const float KillX = -27f;
@@ -306,6 +308,10 @@ public class PowerUpManager : MonoBehaviour {
     Debug.Log("TODO handle this PowerUp activation");
   }
 
+  private static void Heal( PowerUp powUp ) {
+    Player.Instance.Heal( PowData[powUp.Type][powUp.Level-1].effectMult );
+  }
+
   ///////////////////////////  PowerUp Deactivations /////////////////////////
   private static void ProjRadDe( PowerUp powUp ) {
     Projectile.RadPowUp = 1f;
@@ -332,23 +338,23 @@ public class PowerUpManager : MonoBehaviour {
   }
 
   private static void WaterChangeDe( PowerUp powUp ) {
-    Debug.Log("TODO handle this PowerUp deactivation");
+    Debug.Log("Deactivate: do nothing?");
   }
 
   private static void FireChangeDe( PowerUp powUp ) {
-    Debug.Log("TODO handle this PowerUp deactivation");
+    Debug.Log("Deactivate: do nothing?");
   }
 
   private static void WoodChangeDe( PowerUp powUp ) {
-    Debug.Log("TODO handle this PowerUp deactivation");
+    Debug.Log("Deactivate: do nothing?");
   }
 
   private static void EarthChangeDe( PowerUp powUp ) {
-    Debug.Log("TODO handle this PowerUp deactivation");
+    Debug.Log("Deactivate: do nothing?");
   }
 
   private static void MetalChangeDe( PowerUp powUp ) {
-    Debug.Log("TODO handle this PowerUp deactivation");
+    Debug.Log("Deactivate: do nothing?");
   }
 
   private static void HolyChangeDe( PowerUp powUp ) {
@@ -357,6 +363,10 @@ public class PowerUpManager : MonoBehaviour {
 
   private static void SlowEnemyDe( PowerUp powUp ) {
     Debug.Log("TODO handle this PowerUp deactivation");
+  }
+
+  private static void HealDe( PowerUp powUp ) {
+    Debug.Log("Deactivate: do nothing?");
   }
 
   ///////////////////////////  Properties  //////////////////////////
@@ -465,6 +475,12 @@ public class PowerUpManager : MonoBehaviour {
     new PowAttributes(1.75f, 50f, 2f)
   };
 
+  private static PowAttributes[] healLevels = {
+    new PowAttributes(1f, 0f, 1.5f),
+    new PowAttributes(1.5f, 0f, 1.75f),
+    new PowAttributes(1.75f, 0f, 2f)
+  };
+
   private static Dictionary< powType, PowAttributes[] > PowData = new Dictionary<powType, PowAttributes[]> {
     { powType.projRad, projRadLevels },
     { powType.explosionRad, explosionRadLevels },
@@ -478,7 +494,8 @@ public class PowerUpManager : MonoBehaviour {
     { powType.earthChange, earthChangeLevels },
     { powType.metalChange, metalChangeLevels },
     { powType.holyChange, holyChangeLevels },
-    { powType.slowEnemy, slowEnemyLevels }
+    { powType.slowEnemy, slowEnemyLevels },
+    { powType.heal, healLevels }
   };
 
 }

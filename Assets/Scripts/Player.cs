@@ -46,6 +46,10 @@ public class Player : MonoBehaviour {
     life -= 1; //TODO fix this
   }
 
+  public void Heal(float amt) {
+    life += amt;
+  }
+
   //setters and getters
   public static Player Instance { get; private set; }
 
