@@ -243,7 +243,7 @@ public class PowerUpManager : MonoBehaviour {
    * Generates a random PowerUp type
    */
   private powType RandPowType() {
-    float rand = (float)(13 * rng.NextDouble());
+    float rand = (float)(14 * rng.NextDouble());
 
     return (powType) rand;
   }
