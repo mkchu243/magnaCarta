@@ -132,7 +132,6 @@ public abstract class Enemy : MonoBehaviour {
         health -= Ailment.ailmentData[ailmentType.burn][ailments[a].Level].effectMult;
         burnClock.Reset();
         burnClock.Start();
-        UnityEngine.Debug.Log("burn "+ health);
       }
     }
 
