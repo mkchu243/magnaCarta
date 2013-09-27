@@ -1,4 +1,4 @@
-//test
+//mwoo_dev
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -9,15 +9,18 @@ public struct ElementAttributes{
   public HashSet<Element> strength; //NOTE do we even need this?
   public HashSet<Element> creates;
   public ailmentType ailment;
+  public Material mat;
 
   public ElementAttributes(HashSet<Element> weakness,
                            HashSet<Element> strength,
                            HashSet<Element> creates,
-                           ailmentType ailment){
+                           ailmentType ailment,
+                           Material mat){
     this.weakness = weakness;
     this.strength = strength;
     this.creates = creates;
     this.ailment = ailment;
+    this.mat = mat;
   }
 }
 
@@ -45,13 +48,21 @@ static class Reference {
   public static HashSet<Element> CreateMetal = new HashSet<Element> { Element.water };
   public static HashSet<Element> CreateHoly  = new HashSet<Element> { };
 
+  public static Material waterMat = Resources.Load("Materials/waterMat") as Material;
+  public static Material fireMat = Resources.Load("Materials/fireMat") as Material;
+  public static Material woodMat = Resources.Load("Materials/woodMat") as Material;
+  public static Material earthMat = Resources.Load("Materials/earthMat") as Material;
+  public static Material metalMat = Resources.Load("Materials/metalMat") as Material;
+  public static Material holyMat = Resources.Load("Materials/holyMat") as Material;
+  public static Material normalMat = Resources.Load("Materials/normalMat") as Material;
+
   public static Dictionary<Element, ElementAttributes> elements =
     new Dictionary<Element, ElementAttributes>{
-    { Element.water , new ElementAttributes(WeaknessWater, StrengthWater, CreateWater, ailmentType.freeze) }, //TODO make ailments match
-    { Element.fire  , new ElementAttributes(WeaknessFire,  StrengthFire,  CreateFire,  ailmentType.burn) },
-    { Element.wood  , new ElementAttributes(WeaknessWood,  StrengthWood,  CreateWood,  ailmentType.root) },
-    { Element.earth , new ElementAttributes(WeaknessEarth, StrengthEarth, CreateEarth, ailmentType.burn) },
-    { Element.metal , new ElementAttributes(WeaknessMetal, StrengthMetal, CreateMetal, ailmentType.dam) },
-    { Element.holy  , new ElementAttributes(WeaknessHoly,  StrengthHoly,  CreateHoly,  ailmentType.freeze) } //TODO this shouldnt freeze, but it will never happen
+    { Element.water , new ElementAttributes(WeaknessWater, StrengthWater, CreateWater, ailmentType.freeze, waterMat) }, //TODO make ailments match
+    { Element.fire  , new ElementAttributes(WeaknessFire,  StrengthFire,  CreateFire,  ailmentType.burn,   fireMat) },
+    { Element.wood  , new ElementAttributes(WeaknessWood,  StrengthWood,  CreateWood,  ailmentType.root,   woodMat) },
+    { Element.earth , new ElementAttributes(WeaknessEarth, StrengthEarth, CreateEarth, ailmentType.burn,   earthMat) },
+    { Element.metal , new ElementAttributes(WeaknessMetal, StrengthMetal, CreateMetal, ailmentType.dam,    metalMat) },
+    { Element.holy  , new ElementAttributes(WeaknessHoly,  StrengthHoly,  CreateHoly,  ailmentType.freeze, holyMat) } //TODO this shouldnt freeze, but it will never happen
   };
 }

@@ -1,3 +1,5 @@
+// The old power-up script
+
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -22,7 +24,7 @@ public struct BuffAttributes {
   }
 }
 
-public class Powerup : MonoBehaviour {
+public class Powerup1 : MonoBehaviour {
   public enum PowerupType { slow, changeToFire };
   public static Dictionary<PowerupType, BuffAttributes> buffInfo = new Dictionary<PowerupType, BuffAttributes>{
     {PowerupType.slow, new BuffAttributes(10f, true, 0.5f, false, 0f)},
