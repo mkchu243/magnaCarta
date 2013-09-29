@@ -33,7 +33,8 @@ public class Explosion : MonoBehaviour {
           Reload();
         }
         else if (transform.localScale.x < maxRad) {
-          float rad = (1f - (lifeTimer.TheTime / speed) / duration) * (maxRad - initRad) + initRad;
+          //float rad = (1f - (lifeTimer.TheTime / speed) / duration) * (maxRad - initRad) + initRad;
+          float rad = ((lifeTimer.ElapsedMilliseconds / speed) / lifeTime) * (maxRad - initRad) + initRad;
           gameObject.transform.localScale = new Vector3( rad, 0.25f, rad);
         }
         break;
@@ -71,13 +72,13 @@ public class Explosion : MonoBehaviour {
       if (Reference.elements[e.Element].creates.Contains(element)) {
         applyAilment = true;
       }
+    }
   }
 
   ////////////////////////////  Properties  /////////////////////////////
   public static float RadPowUp {
     get { return radPowUp; }
     set { radPowUp = value; }
-    }
   }
 		
   public Element ExploElem{

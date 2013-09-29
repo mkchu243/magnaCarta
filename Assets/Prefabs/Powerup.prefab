@@ -116,10 +116,10 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 400012}
-  - 114: {fileID: 11400000}
   - 136: {fileID: 13600010}
   - 23: {fileID: 2300010}
   - 54: {fileID: 5400000}
+  - 114: {fileID: 11400000}
   m_Layer: 0
   m_Name: Powerup
   m_TagString: powerup
@@ -401,7 +401,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 100012}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1af5caa819a6be641b4de2d612d4a329, type: 3}
+  m_Script: {fileID: 11500000, guid: b8ae9200ec32a784daa15d5d13603e95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!136 &13600000
