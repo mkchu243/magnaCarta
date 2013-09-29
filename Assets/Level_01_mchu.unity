@@ -293,7 +293,6 @@ GameObject:
   - 114: {fileID: 1925573276}
   - 114: {fileID: 1925573279}
   - 114: {fileID: 1925573278}
-  - 114: {fileID: 1925573280}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -418,22 +417,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2926cc2aa4abc664a9f8c6b5bf4c184e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1925573280
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1925573274}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 829287da948c74b42937e4c8fe6209d9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ailFreezePrefab: {fileID: 100000, guid: 9ee4ffdc6d58247419fa7a572b7d3401, type: 2}
-  ailBurnPrefab: {fileID: 100000, guid: 467deb0f1bbc6444dad7120150e5d79a, type: 2}
-  ailRootPrefab: {fileID: 100000, guid: f3830ae0910a3054da16f902378d64e4, type: 2}
-  ailDamPrefab: {fileID: 100000, guid: e4a75c9af62001e4eb95051ee2712ca8, type: 2}
-  ailCutPrefab: {fileID: 100000, guid: a5ff421ba3c8d9441ad0c178ab0b2a3d, type: 2}
 --- !u!1001 &1987558930
 Prefab:
   m_ObjectHideFlags: 0
