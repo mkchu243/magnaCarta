@@ -5,20 +5,27 @@ using System.Collections.Generic;
 public enum Element { water, wood, fire, earth, metal, holy };
 
 public struct ElementAttributes{
-  public HashSet<Element> weakness; //NOTE do we even need this?
-  public HashSet<Element> strength;
+  public HashSet<Element> weakness;
+  public HashSet<Element> strength; //NOTE do we even need this?
   public HashSet<Element> creates;
+  public ailmentType ailment;
   public Material mat;
 
-  public ElementAttributes(HashSet<Element> weakness, HashSet<Element> strength, HashSet<Element> creates, Material mat){
+  public ElementAttributes(HashSet<Element> weakness,
+                           HashSet<Element> strength,
+                           HashSet<Element> creates,
+                           ailmentType ailment,
+                           Material mat){
     this.weakness = weakness;
     this.strength = strength;
     this.creates = creates;
+    this.ailment = ailment;
     this.mat = mat;
   }
 }
 
 static class Reference {
+  //the weakness of that element
   public static HashSet<Element> WeaknessWater = new HashSet<Element> { Element.earth, Element.holy };
   public static HashSet<Element> WeaknessFire  = new HashSet<Element> { Element.water, Element.holy };
   public static HashSet<Element> WeaknessWood  = new HashSet<Element> { Element.metal, Element.holy };
@@ -33,6 +40,7 @@ static class Reference {
   public static HashSet<Element> StrengthMetal = new HashSet<Element> { Element.wood };
   public static HashSet<Element> StrengthHoly  = new HashSet<Element> { Element.water, Element.wood, Element.fire, Element.metal, Element.earth};
 	
+  //what that element creates
   public static HashSet<Element> CreateWater = new HashSet<Element> { Element.wood  };
   public static HashSet<Element> CreateFire  = new HashSet<Element> { Element.earth };
   public static HashSet<Element> CreateWood  = new HashSet<Element> { Element.fire  };
@@ -50,13 +58,11 @@ static class Reference {
 
   public static Dictionary<Element, ElementAttributes> elements =
     new Dictionary<Element, ElementAttributes>{
-    { Element.water , new ElementAttributes(WeaknessWater, StrengthWater, CreateWater, waterMat) },
-    { Element.fire  , new ElementAttributes(WeaknessFire,  StrengthFire,  CreateFire, fireMat) },
-    { Element.wood  , new ElementAttributes(WeaknessWood,  StrengthWood,  CreateWood, woodMat) },
-    { Element.earth , new ElementAttributes(WeaknessEarth, StrengthEarth, CreateEarth, earthMat) },
-    { Element.metal , new ElementAttributes(WeaknessMetal, StrengthMetal, CreateMetal, metalMat) },
-    { Element.holy  , new ElementAttributes(WeaknessHoly,  StrengthHoly,  CreateHoly, holyMat) }
+    { Element.water , new ElementAttributes(WeaknessWater, StrengthWater, CreateWater, ailmentType.freeze, waterMat) }, //TODO make ailments match
+    { Element.fire  , new ElementAttributes(WeaknessFire,  StrengthFire,  CreateFire,  ailmentType.burn,   fireMat) },
+    { Element.wood  , new ElementAttributes(WeaknessWood,  StrengthWood,  CreateWood,  ailmentType.root,   woodMat) },
+    { Element.earth , new ElementAttributes(WeaknessEarth, StrengthEarth, CreateEarth, ailmentType.burn,   earthMat) },
+    { Element.metal , new ElementAttributes(WeaknessMetal, StrengthMetal, CreateMetal, ailmentType.dam,    metalMat) },
+    { Element.holy  , new ElementAttributes(WeaknessHoly,  StrengthHoly,  CreateHoly,  ailmentType.freeze, holyMat) } //TODO this shouldnt freeze, but it will never happen
   };
-
-  //TODO the other elements
 }

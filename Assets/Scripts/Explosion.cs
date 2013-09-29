@@ -1,9 +1,12 @@
 using UnityEngine;
 using System.Collections;
+using System.Diagnostics;
 
 public class Explosion : MonoBehaviour {
-  private Timer lifeTimer;
+  private Stopwatch lifeTimer;
+  private int lifeTime;
   private Element element;
+  private bool applyAilment;
   private float initRad = 1;
   private float maxRad;
   private float duration;
@@ -12,10 +15,10 @@ public class Explosion : MonoBehaviour {
 
   // PowerUp Variables
   private static float radPowUp;
-
+	
   void Awake() {
     transform.Rotate(new Vector3(90, 0, 0));
-    lifeTimer = gameObject.AddComponent<Timer>();
+    lifeTimer = new Stopwatch();
   }
 
 	// Use this for initialization
@@ -26,11 +29,12 @@ public class Explosion : MonoBehaviour {
 	void Update () {
     switch( GameManager.state ) {
       case GameManager.GameState.running:
-        if (lifeTimer.TheTime <= 0) {
+        if (lifeTimer.ElapsedMilliseconds >= lifeTime) {
           Reload();
         }
         else if (transform.localScale.x < maxRad) {
-          float rad = (1f - (lifeTimer.TheTime / speed) / duration) * (maxRad - initRad) + initRad;
+          //float rad = (1f - (lifeTimer.TheTime / speed) / duration) * (maxRad - initRad) + initRad;
+          float rad = ((lifeTimer.ElapsedMilliseconds / speed) / lifeTime) * (maxRad - initRad) + initRad;
           gameObject.transform.localScale = new Vector3( rad, 0.25f, rad);
         }
         break;
@@ -41,8 +45,12 @@ public class Explosion : MonoBehaviour {
     gameObject.SetActive(true);
     transform.position = pos;
 
-    duration = Projectile.projData[e].explosionDuration;
-    lifeTimer.Restart(duration);
+    element = e;     //sets private element var
+    applyAilment = false;
+
+    lifeTimer.Reset();
+    lifeTimer.Start();
+    lifeTime = Projectile.projData[e].explosionDuration;
 
     initRad = p.transform.localScale.x;
     maxRad = Projectile.projData[e].explosionRadius * radPowUp;
@@ -57,10 +65,28 @@ public class Explosion : MonoBehaviour {
     gameObject.SetActive(false);
     cannon.Reload(this);
   }
+    
+  void OnTriggerEnter(Collider other) {
+    if (other.gameObject.tag == "enemy") {
+      Enemy e = other.gameObject.GetComponent<Enemy>();
+      if (Reference.elements[e.Element].creates.Contains(element)) {
+        applyAilment = true;
+      }
+    }
+  }
 
   ////////////////////////////  Properties  /////////////////////////////
   public static float RadPowUp {
     get { return radPowUp; }
     set { radPowUp = value; }
   }
+		
+  public Element ExploElem{
+	  get{return element;}
+  }
+
+  public bool ApplyAilment {
+    get { return applyAilment; }
+  }
+	
 }

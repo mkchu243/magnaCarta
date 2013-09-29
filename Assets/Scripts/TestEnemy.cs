@@ -2,8 +2,8 @@ using UnityEngine;
 using System.Collections.Generic;
 
 public class TestEnemy : Enemy {
-  protected override void Start() {
-  }
+ // protected override void Start() {
+  //}
 
   protected override void Update() {
     base.Update();
