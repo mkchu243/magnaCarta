@@ -28,3 +28,6 @@ Build/*
 *.csproj
 *.unityproj
 *.sln
+
+# Ignore vim's ~ files
+*~
